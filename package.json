@@ -1,0 +1,45 @@
+{
+  "name": "postcss-text-metrics",
+  "version": "0.1.0",
+  "description": "Adjust padding/margin/translate/etc  values on text metrics gaps",
+  "main": "index.js",
+  "scripts": {
+    "compile:css": "npm run gulp",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dashukin/postcss-text-metrics.git"
+  },
+  "keywords": [
+    "postcss",
+    "css",
+    "text",
+    "metrics",
+    "font",
+    "typography",
+    "adjustment"
+  ],
+  "author": "Vasili Molakhau <dashukin@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dashukin/postcss-text-metrics/issues"
+  },
+  "homepage": "https://github.com/dashukin/postcss-text-metrics#readme",
+  "dependencies": {
+    "lodash": "^4.17.4",
+    "postcss": "^5.2.16"
+  },
+  "devDependencies": {
+    "babel": "^6.23.0",
+    "babel-core": "^6.24.0",
+    "babel-preset-latest": "^6.24.0",
+    "del": "^2.2.2",
+    "gulp": "^3.9.1",
+    "gulp-cli": "^1.2.2",
+    "gulp-postcss": "^6.4.0",
+    "gulp-sass": "^3.1.0",
+    "postcss-cli": "^3.1.1",
+    "postcss-scss": "^0.4.1"
+  }
+}
