@@ -9,39 +9,46 @@ import postcssScss from 'postcss-scss';
 import sass from 'gulp-sass';
 import textMetrics from './index';
 
+const textMetricsData = {
+	'p1': [
+		{
+			atRule: null,
+			selector: '.only-parent-selector',
+			// line-height minus font-size minus any additional decreaseBy value
+			baseDelta: 4, // (line-height - font-size) / 2
+			decreaseBy: 1 // text metrics
+		},
+		{
+			atRule: {
+				name: 'media',
+				params: '(max-width: 1499px)'
+			},
+			selector: null,
+			// line-height minus font-size minus any additional decreaseBy value
+			baseDelta: 6, // (line-height - font-size) / 2
+			decreaseBy: 1 // text metrics
+		},
+		{
+			atRule: {
+				name: 'media',
+				params: '(max-width: 1499px)'
+			},
+			selector: '.parent-selector-with-atrule',
+			// line-height minus font-size minus any additional decreaseBy value
+			baseDelta: 8, // (line-height - font-size) / 2
+			decreaseBy: 1 // text metrics
+		}
+	]
+};
+
 // init text metrics plugin
-const textMetricsPlugin = textMetrics({
-	textMetrics: {
-		'p1': [
-			{
-				atRule: null,
-				selector: '.only-parent-selector',
-				// line-height minus font-size minus any additional decreaseBy value
-				baseDelta: 4, // (line-height - font-size) / 2
-				decreaseBy: 1 // text metrics
-			},
-			{
-				atRule: {
-					name: 'media',
-					params: '(max-width: 1499px)'
-				},
-				selector: null,
-				// line-height minus font-size minus any additional decreaseBy value
-				baseDelta: 6, // (line-height - font-size) / 2
-				decreaseBy: 1 // text metrics
-			},
-			{
-				atRule: {
-					name: 'media',
-					params: '(max-width: 1499px)'
-				},
-				selector: '.parent-selector-with-atrule',
-				// line-height minus font-size minus any additional decreaseBy value
-				baseDelta: 8, // (line-height - font-size) / 2
-				decreaseBy: 1 // text metrics
-			}
-		]
-	}
+const cssTextMetricsPlugin = textMetrics({
+	textMetrics: textMetricsData
+});
+
+const scssTextMetricsPlugin = textMetrics({
+	textMetrics: textMetricsData,
+	plainCSS: false
 });
 
 const source = {
@@ -57,16 +64,17 @@ const output = {
 gulp.task('compile:css', () => {
 	del(`${output.css}/*`);
 	gulp.src(source.css)
-		.pipe(gulpPostcss([textMetricsPlugin]))
+		.pipe(gulpPostcss([cssTextMetricsPlugin]))
 		.pipe(gulp.dest(output.css));
 });
 
 gulp.task('compile:scss', () => {
 	del(`${output.scss}/*`);
 	gulp.src(source.scss)
-		.pipe(gulpPostcss([textMetricsPlugin]), {
+		.pipe(gulpPostcss([scssTextMetricsPlugin]), {
 			syntax: postcssScss
 		})
+		.pipe(sass())
 		.pipe(gulp.dest(output.scss));
 });
 
