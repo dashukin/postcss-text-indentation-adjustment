@@ -2,4 +2,9 @@ $paddingTop: 24px;
 
 .simple-rule {
 	padding-top: $paddingTop /*{$paddingTop, p1}*/;
+	
+	.nested-rule-inside-simple-rule {
+		transform: translateY(24px) /*translateY({22px, p1})*/;
+		margin-bottom: 24px/*{24px, p1}*/;
+	}
 }

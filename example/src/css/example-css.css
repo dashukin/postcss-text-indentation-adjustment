@@ -1,3 +1,9 @@
 .simple-rule {
     padding-top: 24px /*{24px, p1}*/;
 }
+
+@media (max-width: 1499px) {
+    .simple-rule {
+        margin-bottom: 24px /*{24px, p1}*/;
+    }
+}
