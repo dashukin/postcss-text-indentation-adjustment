@@ -2,12 +2,19 @@
 * gulp tasks
 * */
 
+/**
+ * @name fse
+ */
+
 import gulp from 'gulp';
 import del from 'del';
 import gulpPostcss from 'gulp-postcss';
 import postcssScss from 'postcss-scss';
 import sass from 'gulp-sass';
+import nodeSass from 'node-sass';
+import fse from 'fs-extra';
 import textMetrics from './index';
+import parse from './lib/parser';
 
 const textMetricsData = {
 	'p1': [
@@ -53,13 +60,26 @@ const scssTextMetricsPlugin = textMetrics({
 
 const source = {
 	css: './example/src/css/**/*.css',
-	scss: './example/src/scss/**/*.scss'
+	cssTypography: './example/src/css-typography/css-typography.css',
+	scss: './example/src/scss/**/*.scss',
+	scssTypography: './example/src/scss-typography/scss-typography.scss',
 };
 
 const output = {
 	css: './example/dist/css',
 	scss: './example/dist/scss'
-}
+};
+
+const cssData = fse.readFileSync(source.cssTypography, 'utf8');
+const parsedCSSData = parse(cssData);
+console.log(parsedCSSData);
+
+const scssData = nodeSass.renderSync({
+	file: source.scssTypography
+}).css.toString();
+
+const parsedScssData = parse(scssData);
+console.log(parsedScssData);
 
 gulp.task('compile:css', () => {
 	del(`${output.css}/*`);
