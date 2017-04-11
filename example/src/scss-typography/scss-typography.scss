@@ -1,0 +1,25 @@
+.p1 {
+	// pure correction data
+	font-size: 12px;
+	line-height: 18px;
+	font-family: Arial;
+	
+	@media (min-width: 1499px) {
+		// atRule based correction data
+		font-size: 16px;
+		line-height: 22px;
+	}
+	
+	html[lang="en"] & {
+		// selector based correction data
+		font-size: 18px;
+		line-height: 24px;
+		font-family: Arial;
+		
+		@media (min-width: 1499px) {
+			// atRule + selector based correction data
+			font-size: 20px;
+			line-height: 26px;
+		}
+	}
+}
