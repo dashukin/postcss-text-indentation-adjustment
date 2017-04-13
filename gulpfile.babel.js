@@ -3,7 +3,14 @@
 * */
 
 /**
+ * @name gulp
+ * @property task
+ * @property pipe
+ */
+
+/**
  * @name fse
+ * @property readFileSync
  */
 
 import gulp from 'gulp';
