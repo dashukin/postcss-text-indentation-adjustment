@@ -21,7 +21,7 @@ import sass from 'gulp-sass';
 import nodeSass from 'node-sass';
 import fse from 'fs-extra';
 import textMetrics from './index';
-import parse from './lib/parser';
+import parser from './lib/parser';
 
 const textMetricsData = {
 	'p1': [
@@ -77,8 +77,11 @@ const output = {
 	scss: './example/dist/scss'
 };
 
+const parse = parser();
+
 const cssData = fse.readFileSync(source.cssTypography, 'utf8');
 const parsedCSSData = parse(cssData);
+console.log('parsedCSSData:');
 console.log(parsedCSSData);
 
 const scssData = nodeSass.renderSync({
@@ -86,6 +89,7 @@ const scssData = nodeSass.renderSync({
 }).css.toString();
 
 const parsedScssData = parse(scssData);
+console.log('parsedSCSSData:');
 console.log(parsedScssData);
 
 gulp.task('compile:css', () => {
