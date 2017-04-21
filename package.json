@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "compile:css": "npm run gulp",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
