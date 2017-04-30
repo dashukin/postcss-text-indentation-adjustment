@@ -23,7 +23,7 @@ import fse from 'fs-extra';
 import textMetrics from './index';
 import parser from './lib/parser';
 
-const textMetricsData = {
+const corrections = {
 	'p1': [
 		{
 			atRule: null,
@@ -57,11 +57,11 @@ const textMetricsData = {
 
 // init text metrics plugin
 const cssTextMetricsPlugin = textMetrics({
-	textMetrics: textMetricsData
+	corrections
 });
 
 const scssTextMetricsPlugin = textMetrics({
-	textMetrics: textMetricsData,
+	corrections,
 	plainCSS: false
 });
 
