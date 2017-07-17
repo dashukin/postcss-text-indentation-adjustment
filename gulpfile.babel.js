@@ -105,7 +105,10 @@ gulp.task('compile:scss', () => {
 		.pipe(gulpPostcss([scssTextMetricsPlugin]), {
 			syntax: postcssScss
 		})
-		.pipe(sass())
+		.pipe(sass()).on('error', function (err) {
+			console.log(err);
+			this.emit('end');
+		})
 		.pipe(gulp.dest(output.scss));
 });
 
