@@ -28,7 +28,7 @@
   "homepage": "https://github.com/dashukin/postcss-text-metrics#readme",
   "dependencies": {
     "lodash": "^4.17.4",
-    "postcss": "^5.2.16",
+    "postcss": "^6.0.6",
     "postcss-font-helpers": "^3.0.0"
   },
   "devDependencies": {
@@ -39,11 +39,11 @@
     "fs-extra": "^2.1.2",
     "gulp": "^3.9.1",
     "gulp-cli": "^1.2.2",
-    "gulp-postcss": "^6.4.0",
+    "gulp-postcss": "^7.0.0",
     "gulp-sass": "^3.1.0",
     "jest": "^19.0.2",
     "node-sass": "^4.5.2",
     "postcss-cli": "^3.1.1",
-    "postcss-scss": "^0.4.1"
+    "postcss-scss": "^1.0.2"
   }
 }
