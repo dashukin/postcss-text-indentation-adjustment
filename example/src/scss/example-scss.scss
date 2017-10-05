@@ -1,10 +1,11 @@
 $paddingTop: 24px;
-
+/*! sss1*/
 .simple-rule {
-	padding-top: $paddingTop /*{$paddingTop, p1}*/;
+	padding-top: $paddingTop /* {$paddingTop, .p1}*/;
+	transform: translateX(24px) /* translateX({24px, .p1})*/;
 	
 	.nested-rule-inside-simple-rule {
-		transform: translateY(24px) /*translateY({22px, p1})*/;
-		margin-bottom: 24px/*{24px, p1}*/;
+		margin-bottom: 24px /* {24px, .p1}*/;
+		transform: translateY(24px) /* translateY({24px, .p1})*/;
 	}
 }

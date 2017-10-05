@@ -1,9 +1,15 @@
 .simple-rule {
-    padding-top: 24px /*{24px, p1}*/;
+	padding-top: 24px /* {24px, .p1} */;
+}
+
+.simple-rule .nested-rule-inside-simple-rule {
+	margin-bottom: 24px /* {24px, .p1} */;
+	transform: translateY(24px) /* translateY({24px, .p1})*/;
 }
 
 @media (max-width: 1499px) {
-    .simple-rule {
-        margin-bottom: 24px /*{24px, p1}*/;
-    }
+	.simple-rule {
+		margin-bottom: 24px /* {24px, .p1} */;
+		transform: translateY(24px) /* translateY({24px, .p1}) */;
+	}
 }

@@ -22,77 +22,64 @@ import nodeSass from 'node-sass';
 import fse from 'fs-extra';
 import textMetrics from './index';
 import parser from './lib/parser';
-
-const corrections = {
-	'p1': [
-		{
-			atRule: null,
-			selector: '.only-parent-selector',
-			// line-height minus font-size minus any additional decreaseBy value
-			baseDelta: 4, // (line-height - font-size) / 2
-			decreaseBy: 1 // text metrics
-		},
-		{
-			atRule: {
-				name: 'media',
-				params: '(max-width: 1499px)'
-			},
-			selector: null,
-			// line-height minus font-size minus any additional decreaseBy value
-			baseDelta: 6, // (line-height - font-size) / 2
-			decreaseBy: 1 // text metrics
-		},
-		{
-			atRule: {
-				name: 'media',
-				params: '(max-width: 1499px)'
-			},
-			selector: '.parent-selector-with-atrule',
-			// line-height minus font-size minus any additional decreaseBy value
-			baseDelta: 8, // (line-height - font-size) / 2
-			decreaseBy: 1 // text metrics
-		}
-	]
-};
-
-// init text metrics plugin
-const cssTextMetricsPlugin = textMetrics({
-	corrections
-});
-
-const scssTextMetricsPlugin = textMetrics({
-	corrections,
-	plainCSS: false
-});
+import fontMetrics from 'font-metrics';
+import runSequence from 'run-sequence';
 
 const source = {
 	css: './example/src/css/**/*.css',
 	cssTypography: './example/src/css-typography/css-typography.css',
 	scss: './example/src/scss/**/*.scss',
 	scssTypography: './example/src/scss-typography/scss-typography.scss',
+	fontMetricsSrc: './example/dist/font-metrics/font-metrics.json'
 };
 
 const output = {
 	css: './example/dist/css',
-	scss: './example/dist/scss'
+	scss: './example/dist/scss',
+	fontMetrics: './example/dist/font-metrics'
 };
 
-const parse = parser();
+function getFontMetricsData () {
+	let metrics;
 
-const cssData = fse.readFileSync(source.cssTypography, 'utf8');
-const parsedCSSData = parse(cssData);
-console.log('parsedCSSData:');
-console.log(parsedCSSData);
+	try {
+		metrics = JSON.parse(fse.readFileSync(source.fontMetricsSrc, 'utf-8'));
+	} catch (error) {
+		console.log(error);
+		metrics = {};
+	}
+	return metrics;
+}
 
-const scssData = nodeSass.renderSync({
-	file: source.scssTypography
-}).css.toString();
+function parseTypography (input) {
+	const fontMetricsData = getFontMetricsData();
+	const parse = parser({
+		metrics: fontMetricsData.metrics
+	});
 
-const parsedScssData = parse(scssData);
-console.log('parsedSCSSData:');
-console.log(parsedScssData);
+	return parse(input);
+}
+
+gulp.task('fonts:parse', () => {
+	const fontParser = fontMetrics({
+		fonts: [{
+			fontFamily: 'Arial'
+		}],
+		output: output.fontMetrics,
+		filename: 'font-metrics.json'
+	});
+
+	del(`${output.fontMetrics}/*`);
+	fontParser.parse();
+});
 
 gulp.task('compile:css', () => {
+	const cssData = fse.readFileSync(source.cssTypography, 'utf8');
+	const parsedCSSData = parseTypography(cssData);
+	const cssTextMetricsPlugin = textMetrics({
+		corrections: parsedCSSData
+	});
+
 	del(`${output.css}/*`);
 	gulp.src(source.css)
 		.pipe(gulpPostcss([cssTextMetricsPlugin]))
@@ -100,12 +87,23 @@ gulp.task('compile:css', () => {
 });
 
 gulp.task('compile:scss', () => {
+	const scssData = nodeSass.renderSync({
+		file: source.scssTypography
+	}).css.toString();
+	const parsedScssData = parseTypography(scssData);
+	const scssTextMetricsPlugin = textMetrics({
+		corrections: parsedScssData,
+		plainCSS: false
+	});
+
 	del(`${output.scss}/*`);
 	gulp.src(source.scss)
 		.pipe(gulpPostcss([scssTextMetricsPlugin]), {
-			syntax: postcssScss
+			parser: postcssScss
 		})
-		.pipe(sass()).on('error', function (err) {
+		.pipe(sass({
+			outputStyle: 'expanded'
+		})).on('error', function (err) {
 			console.log(err);
 			this.emit('end');
 		})
@@ -113,7 +111,7 @@ gulp.task('compile:scss', () => {
 });
 
 gulp.task('compile:all', () => {
-	console.log('Not implemented');
+	runSequence(['compile:css', 'compile:scss']);
 });
 
 gulp.task('watch:css', () => {

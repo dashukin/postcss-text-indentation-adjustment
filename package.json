@@ -4,7 +4,10 @@
   "description": "Adjust padding/margin/translate/etc  values on text metrics gaps",
   "main": "index.js",
   "scripts": {
-    "compile:css": "npm run gulp",
+    "fonts:parse": "node ./node_modules/gulp/bin/gulp fonts:parse",
+    "compile:css": "node ./node_modules/gulp/bin/gulp compile:css",
+    "compile:scss": "node ./node_modules/gulp/bin/gulp compile:scss",
+    "compile:all": "node ./node_modules/gulp/bin/gulp compile:all",
     "test": "jest"
   },
   "repository": {
@@ -36,6 +39,8 @@
     "babel-core": "^6.24.0",
     "babel-preset-latest": "^6.24.0",
     "del": "^2.2.2",
+    "electron": "^1.7.8",
+    "font-metrics": "^0.4.2",
     "fs-extra": "^2.1.2",
     "gulp": "^3.9.1",
     "gulp-cli": "^1.2.2",
@@ -44,6 +49,7 @@
     "jest": "^19.0.2",
     "node-sass": "^4.5.2",
     "postcss-cli": "^3.1.1",
-    "postcss-scss": "^1.0.2"
+    "postcss-scss": "^1.0.2",
+    "run-sequence": "^2.2.0"
   }
 }
