@@ -20,8 +20,8 @@ import postcssScss from 'postcss-scss';
 import sass from 'gulp-sass';
 import nodeSass from 'node-sass';
 import fse from 'fs-extra';
-import textMetrics from './index';
-import parser from './lib/parser';
+import textMetrics from './src/index';
+import parser from './src/lib/parser';
 import fontMetrics from 'font-metrics';
 import runSequence from 'run-sequence';
 

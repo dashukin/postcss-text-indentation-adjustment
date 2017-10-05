@@ -14,7 +14,7 @@ import {
 	hasGroup,
 	exctractAtRuleReplacement,
 	makeStringOneLine
-} from '../lib/helpers';
+} from './helpers';
 
 test('should return array of parsed declarations or empty array if no declarations were found', () => {
 	expect(extractDeclarations('padding: {$p1, .l2, .p2} {$p2, .l2, .p3};'))
