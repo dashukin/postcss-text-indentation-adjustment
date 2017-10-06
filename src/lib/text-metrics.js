@@ -592,12 +592,12 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 		 */
 		function createDeclarations (rule, declarationProperty, declarationValue) {
 			if (!rule || (rule.type !== 'rule') || (rule.type !== 'root')) {
-				_logDebug('createDeclarations - invalid type of parentNode.');
+				_logDebug(`createDeclarations: invalid type of parentNode - ${rule.type}`);
 				return;
 			}
 			
 			if (!_.isString(declarationProperty)) {
-				_logDebug('createDeclarations - invalid type of declarationProperty.');
+				_logDebug(`createDeclarations: invalid type of declarationProperty - ${declarationProperty}`);
 				return;
 			}
 			
