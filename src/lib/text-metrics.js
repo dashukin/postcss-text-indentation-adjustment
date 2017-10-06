@@ -66,13 +66,9 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 			const {type} = node;
 
 			if (type === 'rule') {
-				processNode(node);
-			} else if (type === 'atRule') {
-				processNode(node);
-			} else if (type === 'decl') {
-				processDeclaration(node);
-			} else if (type === 'comment') {
-				processComment(node);
+				processRule(node);
+			} else if (type === 'atrule') {
+				processAtRule(node);
 			}
 		});
 		
