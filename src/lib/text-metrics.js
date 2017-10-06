@@ -591,7 +591,7 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 		 * @param declarationValue.value {Number|String} Declaration value
 		 */
 		function createDeclarations (rule, declarationProperty, declarationValue) {
-			if (!rule || (rule.type !== 'rule') || (rule.type !== 'root')) {
+			if (!rule || ((rule.type !== 'rule') || (rule.type !== 'root'))) {
 				_logDebug(`createDeclarations: invalid type of parentNode - ${rule.type}`);
 				return;
 			}
