@@ -26365,13 +26365,13 @@ exports.default = _postcss2.default.plugin('postcss-text-metrics', function () {
    * @param declarationValue.value {Number|String} Declaration value
    */
 		function createDeclarations(rule, declarationProperty, declarationValue) {
-			if (!rule || rule.type !== 'rule') {
-				_logDebug('createDeclarations - invalid type of parentNode.');
+			if (!rule || rule.type !== 'rule' || rule.type !== 'root') {
+				_logDebug('createDeclarations: invalid type of parentNode - ' + rule.type);
 				return;
 			}
 
 			if (!_lodash2.default.isString(declarationProperty)) {
-				_logDebug('createDeclarations - invalid type of declarationProperty.');
+				_logDebug('createDeclarations: invalid type of declarationProperty - ' + declarationProperty);
 				return;
 			}
 
