@@ -612,7 +612,8 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 				const {value = null, selector = null, atRule = null} = declarationData;
 				
 				if (!value) {
-					_logDebug('createDeclarations - attempted to update declaration with invalid value');
+					_logDebug('createDeclarations: attempted to update declaration with invalid value:');
+					_logDebug(`createDeclarations: value - ${value}, selector - ${selector}, atRule - ${atRule}`);
 					return;
 				}
 				
