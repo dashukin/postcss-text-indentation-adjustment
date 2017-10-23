@@ -59,9 +59,8 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 		calculate = true, 	// if corrected values should be calculated. In case final value is NaN - all expression should be wrapped in calc()
 		useCalc = false
 	} = options;
-	
-	return (css) => {
 
+	return (css, result) => {
 		css.each(node => {
 			const {type} = node;
 
@@ -71,7 +70,7 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 				processAtRule(node);
 			}
 		});
-		
+
 		function processNode (node) {
 			node.each(childNode => {
 				const {type} = childNode;
@@ -87,7 +86,7 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 				}
 			});
 		}
-		
+
 		function processRule (rule) {
 			rule.each(node => {
 				const {type} = node;
@@ -98,57 +97,57 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 				}
 			});
 		}
-		
+
 		function processComment (node) {
 			// process comment. NOTE: higher priority is given to declaration parsing.
 			// create reference to comment's rule (parent node) so we can create new declarations later
 			const rule = node.parent;
-			
+
 			// save comment value
 			const commentText = node.text;
-			
+
 			// remove parsed comment node
 			node.remove();
-			
+
 			// check if comment has any correction group
 			if (!hasGroup(commentText)) {
 				return;
 			}
-			
+
 			// parse comment and get an object containing declarations and their values.
 			const newDeclarations = parseComment(commentText);
-			
+
 			// do nothing if it was a comment without correction group
 			if (!newDeclarations) {
 				return;
 			}
-			
+
 			_.each(newDeclarations, (declarationValue, declarationProp) => {
 				const pureCorrectedDeclarationValue = getPureCorrectedDeclarationValue(declarationValue);
-				
+
 				// create pure correction
 				createDeclarations(rule, declarationProp, {
 					value: pureCorrectedDeclarationValue
 				});
-				
+
 				// create selector based corrections
 				const selectorBasedDeclarations = getSelectorBasedCorrectedDeclarationValues(declarationValue);
 				createDeclarations(rule, declarationProp, selectorBasedDeclarations);
-				
+
 				// create atRule based corrections
 				const atRuleBasedDeclarations = getAtRuleBasedCorrectedDeclarationValues(declarationValue);
 				createDeclarations(rule, declarationProp, atRuleBasedDeclarations);
-				
+
 				// create atRule + selector based corrections
 				const atRuleSelectorBasedDeclarations = getAtRuleSelectorBasedCorrectedDeclarationValues(declarationValue);
 				createDeclarations(rule, declarationProp, atRuleSelectorBasedDeclarations);
 			});
 		}
-		
+
 		function processDeclaration (node) {
 			// correction template could be stored in declaration.
 			// e.g. padding: $p1 - 5px - 2px /*{24px, .p2, .p1} 0 {24px, .p2, .p3}*/;
-			
+
 			// comment in declaration could be accessed via raw value.
 			// get raw declaration value
 			// e.g. $p1 - 5px - 2px /*{24px, .p2, .p1} 0 {24px, .p2, .p3}*/
@@ -159,14 +158,14 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 
 				const declarationRule = node.parent;
 				const declarationProperty = node.prop;
-				
+
 				// exctract value that is going to be processed
 				// e.g. {24px, .p2, .p1} 0 {24px, .p2, .p3}
 				const newDeclrationValue = extractValue(rawValue);
 
 				// replace all correction groups with processed values
 				// e.g. 24px - 5 - 7 0 24px - 5 - 0
-				
+
 				// create pure correction
 				const pureCorrectedDeclarationValue = getPureCorrectedDeclarationValue(newDeclrationValue);
 				createDeclarations(declarationRule, declarationProperty, {
@@ -176,17 +175,17 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 				// create selector based corrections
 				const selectorBasedDeclarations = getSelectorBasedCorrectedDeclarationValues(newDeclrationValue);
 				createDeclarations(declarationRule, declarationProperty, selectorBasedDeclarations);
-				
+
 				// create atRule based corrections
 				const atRuleBasedDeclarations = getAtRuleBasedCorrectedDeclarationValues(newDeclrationValue);
 				createDeclarations(declarationRule, declarationProperty, atRuleBasedDeclarations);
-				
+
 				// create atRule + selector based corrections
 				const atRuleSelectorBasedDeclarations = getAtRuleSelectorBasedCorrectedDeclarationValues(newDeclrationValue);
 				createDeclarations(declarationRule, declarationProperty, atRuleSelectorBasedDeclarations);
 			}
 		}
-		
+
 		function processAtRule (atRule) {
 			// atrule covers any rule that starts with "@" including @media, @include, etc
 			// for all cases we should ensure if there're any correction groups that should be processed.
@@ -197,24 +196,24 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 				// otherwise parse atrule value
 				// each rule/declaration/comment/etc has it's original value stored in "raws" property
 				const atRuleRawValue = _.get(atRule, 'raws.params.raw', '');
-				
+
 				if (!hasGroup(atRuleRawValue)) {
 					return;
 				}
-				
+
 				// get new value from atRule params
 				// e.g. {0, .p1, .l1} from @include yourMixinName(0/*{0, .p1, .l1}*/);
 				const newDeclrationValue = extractValue(atRuleRawValue) || '';
 				// create corrected value
 				const pureCorrectedDeclarationValue = getPureCorrectedDeclarationValue(newDeclrationValue);
-				
+
 				if (!pureCorrectedDeclarationValue) {
 					return;
 				}
 				// find a string in atRule params that should be replaced with corrected value
 				// e.g.  0/*{0, .p1, .l1}*/
 				const atRuleReplacement = exctractAtRuleReplacement(atRuleRawValue);
-				
+
 				if (!atRuleReplacement) {
 					_logDebug('could not extract atRule replacement from ' + atRuleRawValue);
 				}
@@ -224,8 +223,8 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 				atRule.params = newAtRuleParams;
 			}
 		}
-		
-		
+
+
 		/**
 		 * Parse comment text and exctract declarations and values.
 		 * e.g. inline comment - // padding: {$p2, .p1, .p3}
@@ -240,22 +239,22 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 		function parseComment (text) {
 			const newDeclarations = {};
 			const parsedDeclarations = extractDeclarations(text);
-			
+
 			parsedDeclarations.forEach(parsedDeclaration => {
 				// parse declaration property name
 				const declarationProp = extractProperty(parsedDeclaration);
 				const declarationValue = extractValue(parsedDeclaration);
-				
+
 				if (!declarationProp || !declarationValue) {
 					return newDeclarations;
 				}
-				
+
 				newDeclarations[declarationProp] = declarationValue;
 			});
-			
+
 			return newDeclarations;
 		}
-		
+
 		/**
 		 * Create pure corrected declaration value parsed from input string.
 		 * @param declarationValue {String} Initial declaration value that shoud be corrected.
@@ -264,12 +263,12 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 		function getPureCorrectedDeclarationValue (declarationValue) {
 			let correctedDeclarationvalue = declarationValue;
 			const correctionGroups = extractGroups(declarationValue);
-			
+
 			correctionGroups.forEach(initialGroup => {
 				const initialGroupArguments = getCorrectionGroupArguments(initialGroup);
 				const firstArgument = initialGroupArguments[0];
 				const correctionDataCollection = getCorrectedData.apply(null, initialGroupArguments);
-				
+
 				// Process pure corrections without any "selector" or "atRule" modifications:
 				// pure corrections rely on data without correction selectors and atRules.
 				// in case there're multiple definitions of any rules for the same selector we should use the last one
@@ -291,14 +290,14 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 					calculate,
 					useCalc
 				});
-				
+
 				correctedDeclarationvalue = correctedDeclarationvalue.replace(`{${initialGroup}}`, correctedValue);
 			});
-			
+
 			return correctionGroups.length ? correctedDeclarationvalue : null;
 		}
-		
-		
+
+
 		/**
 		 * Create selector based corrected declaration values
 		 * @param declarationValue
@@ -323,7 +322,7 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 
 				return outputData;
 			}, {});
-			
+
 			// find all possible selector used for exctracted classNames
 			const uniqueSelectors = _.uniq(_.reduce(classNamesData, (selectorsOutput, classNameData) => {
 				const classNameDataSelectors = classNameData.reduce((classNameSelectorsOutput, correctionData) => {
@@ -334,11 +333,11 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 			}, [])).filter(selector => {
 				return !!selector;
 			});
-			
+
 			// iterate over unique selectors and create additional declarations based on selectors and classNamesData
 			const selectorBasedDeclarations = uniqueSelectors.reduce((declarationsOutput, selector) => {
 				let selectorBasedCorrectedDeclarationValue = initialDeclarationValue;
-				
+
 				correctionGroups.forEach(correctionGroup => {
 					const [firstArgument, ...correctionGroupClassNames] = getCorrectionGroupArguments(correctionGroup);
 					const correctionValues = correctionGroupClassNames.reduce((calculatedOutput, correctionClassName) => {
@@ -348,30 +347,30 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 						const correctedClassNameValueData = _.find(correctedClassNameValues, {selector}) || _.find(correctedClassNameValues, {selector: ''}) || null;
 						const baseDelta = _.get(correctedClassNameValueData, 'baseDelta', 0);
 						const decreaseBy = _.get(correctedClassNameValueData, 'decreaseBy', 0);
-						
+
 						return calculatedOutput.concat([baseDelta, decreaseBy]);
 					}, [firstArgument])
-					
+
 					const correctedValue = getCorrectedValue({
 						correctionValues,
 						calculate,
 						useCalc
 					});
-					
+
 					selectorBasedCorrectedDeclarationValue = selectorBasedCorrectedDeclarationValue.replace(`{${correctionGroup}}`, correctedValue);
 				});
-				
+
 				const correctedSelectorBasedDeclarationData = {
 					selector,
 					value: selectorBasedCorrectedDeclarationValue
 				}
-				
+
 				return declarationsOutput.push(correctedSelectorBasedDeclarationData), declarationsOutput;
 			}, []);
-			
+
 			return selectorBasedDeclarations;
 		}
-		
+
 		/**
 		 * get atRule based corrected declaration values
 		 * @param declarationValue {String}
@@ -379,7 +378,7 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 		 */
 		function getAtRuleBasedCorrectedDeclarationValues (declarationValue) {
 			const initialDeclarationValue = declarationValue;
-			
+
 			// first of all we should get all classNames data.
 			const correctionGroups = extractGroups(declarationValue);
 
@@ -398,7 +397,7 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 
 				return outputData;
 			}, {});
-			
+
 			// find all possible selector used for exctracted classNames
 			const uniqueAtRules = _.uniq(_.reduce(classNamesData, (selectorsOutput, classNameData) => {
 				const classNameDataSelectors = classNameData.reduce((classNameSelectorsOutput, correctionData) => {
@@ -409,11 +408,11 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 			}, [])).filter(atRule => {
 				return !!atRule;
 			});
-			
+
 			// iterate over unique selectors and create additional declarations based on selectors and classNamesData
 			const atRuleBasedDeclarations = uniqueAtRules.reduce((declarationsOutput, atRule) => {
 				let atRuleBasedCorrectedDeclarationValue = initialDeclarationValue;
-				
+
 				correctionGroups.forEach(correctionGroup => {
 					const [firstArgument, ...correctionGroupClassNames] = getCorrectionGroupArguments(correctionGroup);
 					const correctionValues = correctionGroupClassNames.reduce((calculatedOutput, correctionClassName) => {
@@ -423,7 +422,7 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 						const correctedClassNameValueData = _.find(correctedClassNameValues, {atRule}) || _.find(correctedClassNameValues, {atRule: null}) || null;
 						const baseDelta 	= _.get(correctedClassNameValueData, 'baseDelta', 0);
 						const decreaseBy 	= _.get(correctedClassNameValueData, 'decreaseBy', 0);
-						
+
 						return calculatedOutput.concat([baseDelta, decreaseBy]);
 					}, [firstArgument]);
 
@@ -432,7 +431,7 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 						calculate,
 						useCalc
 					});
-					
+
 					atRuleBasedCorrectedDeclarationValue = atRuleBasedCorrectedDeclarationValue.replace(`{${correctionGroup}}`, correctedValue);
 				});
 
@@ -440,13 +439,13 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 					atRule,
 					value: atRuleBasedCorrectedDeclarationValue
 				}
-				
+
 				return declarationsOutput.push(correctedSelectorBasedDeclarationData), declarationsOutput;
 			}, []);
-			
+
 			return atRuleBasedDeclarations;
 		}
-		
+
 		/**
 		 * get atRule + selector based corrected declaration values
 		 * @param declarationValue {String}
@@ -454,7 +453,7 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 		 */
 		function getAtRuleSelectorBasedCorrectedDeclarationValues (declarationValue) {
 			const initialDeclarationValue = declarationValue;
-			
+
 			// first of all we should get all classNames data.
 			const correctionGroups = extractGroups(declarationValue);
 
@@ -471,7 +470,7 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 					})
 				return outputData;
 			}, {});
-			
+
 			// find all possible selector used for exctracted classNames
 			const uniqueAtRulesSelectors = _.uniq(_.reduce(classNamesData, (selectorsOutput, classNameData) => {
 				const classNameDataSelectors = classNameData.reduce((classNameSelectorsOutput, correctionData) => {
@@ -482,11 +481,11 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 			}, [])).filter(atRule => {
 				return !!atRule;
 			});
-			
+
 			// iterate over unique selectors and create additional declarations based on selectors and classNamesData
 			const atRuleBasedDeclarations = uniqueAtRulesSelectors.reduce((declarationsOutput, uniqueData) => {
 				let atRuleBasedCorrectedDeclarationValue = initialDeclarationValue;
-				
+
 				correctionGroups.forEach(correctionGroup => {
 					const [firstArgument, ...correctionGroupClassNames] = getCorrectionGroupArguments(correctionGroup);
 					const correctionValues = correctionGroupClassNames.reduce((calculatedOutput, correctionClassName) => {
@@ -498,7 +497,7 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 
 						const baseDelta = _.get(correctedClassNameValueData, 'baseDelta', 0);
 						const decreaseBy = _.get(correctedClassNameValueData, 'decreaseBy', 0);
-						
+
 						return calculatedOutput.concat([baseDelta, decreaseBy]);
 					}, [firstArgument]);
 
@@ -507,7 +506,7 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 						calculate,
 						useCalc
 					});
-					
+
 					atRuleBasedCorrectedDeclarationValue = atRuleBasedCorrectedDeclarationValue.replace(`{${correctionGroup}}`, correctedValue);
 				});
 
@@ -516,14 +515,14 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 					selector: uniqueData.selector,
 					value: atRuleBasedCorrectedDeclarationValue
 				}
-				
+
 				return declarationsOutput.push(correctedSelectorBasedDeclarationData), declarationsOutput;
 			}, []);
-			
+
 			return atRuleBasedDeclarations;
 		}
-		
-		
+
+
 		/**
 		 *
 		 * @param initialValue {Number|String}
@@ -533,7 +532,7 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 		 */
 		function getCorrectedData (initialValue = 0, ...classNames) {
 			const classNamesCorrectionsData = [];
-			
+
 			classNames.forEach(className => {
 				/**
 				 * @name correctionData
@@ -545,10 +544,10 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 					classNamesCorrectionsData.push(correctionData);
 				}
 			});
-			
+
 			return classNamesCorrectionsData;
 		}
-		
+
 		/**
 		 * Combine corrections into final result.
 		 * In case calculate option is set to true - try to process given values and provide a result one.
@@ -574,10 +573,10 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 				: useCalc || (isNaN(calculatedValue) && useCalc)
 					? `calc(${expressionValue})`
 					: expressionValue;
-			
+
 			return outputValue;
 		}
-		
+
 		/**
 		 * Update declaration value or create new one if declarationValue data contains any modification selector or atRule
 		 * @param rule {Object} Postcss rule object that should be updated with new declaration(s)
@@ -591,28 +590,28 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 				_logDebug(`createDeclarations: invalid type of parentNode - ${rule.type}`);
 				return;
 			}
-			
+
 			if (!_.isString(declarationProperty)) {
 				_logDebug(`createDeclarations: invalid type of declarationProperty - ${declarationProperty}`);
 				return;
 			}
-			
+
 			const {selector: ruleSelector, raws: ruleRaws} = rule;
 			const hasParentRule = rule.parent !== rule.root();
 			const ampersandValue = plainCSS || !hasParentRule ? '' : '&';
-			
+
 			// create array of declaration values even if only one object has been passed.
 			declarationValue = [].concat(declarationValue);
-			
+
 			declarationValue.forEach(declarationData => {
 				const {value = null, selector = null, atRule = null} = declarationData;
-				
+
 				if (!value) {
 					_logDebug('createDeclarations: attempted to update declaration with invalid value:');
 					_logDebug(`createDeclarations: value - ${value}, selector - ${selector}, atRule - ${atRule}`);
 					return;
 				}
-				
+
 				if (!selector && !atRule) {
 					// if there's no selector and atRule in declarationData
 					// we should update existing declaration values or create new directly in provided rule node
@@ -630,7 +629,7 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 						});
 						rule.append(newDeclaration);
 					}
-					
+
 				} else if (selector && !atRule) {
 					// selector based correction
 					// create new declaration
@@ -638,7 +637,7 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 						prop: declarationProperty,
 						value
 					});
-					
+
 					// create new nested rule
 					const newRule = new postCSS.rule();
 					// update rules selector
@@ -646,7 +645,7 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 					newRule.append(additionalRuleDeclaration);
 					newRule.raws.before = ruleRaws.before;
 					newRule.raws.after = ruleRaws.after;
-					
+
 					// insert newly created rule into node.
 					rule.parent.append(newRule);
 				} else if (!selector && atRule) {
@@ -658,19 +657,19 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 					newAtRule.params = atRuleParams;
 					newAtRule.raws.before = ruleRaws.before;
 					newAtRule.raws.after = ruleRaws.after;
-					
+
 					const declaration = new postCSS.decl({
 						prop: declarationProperty,
 						value
 					});
-					
+
 					const newRule = new postCSS.rule();
 					newRule.selector = ruleSelector;
-					
+
 					rule.parent.append(newAtRule);
 					newAtRule.append(newRule);
 					newRule.append(declaration);
-					
+
 				} else if (selector && atRule) {
 					// atRule + selector based correction
 					const {name: atRuleName, params: atRuleParams} = atRule;
@@ -680,11 +679,11 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 					newAtRule.params = atRuleParams;
 					newAtRule.raws.before = ruleRaws.before;
 					newAtRule.raws.after = ruleRaws.after;
-					
+
 					const newRule = new postCSS.rule();
 
 					newRule.selector = `${selector} ${ampersandValue} ${ruleSelector}`.replace(/\s{2,}/gi, ' ');
-					
+
 					const declaration = new postCSS.decl({
 						prop: declarationProperty,
 						value
