@@ -13,7 +13,10 @@
  * @property readFileSync
  */
 
+import path from 'path';
 import gulp from 'gulp';
+import webpack from 'webpack';
+import gulpWebpack from 'gulp-webpack';
 import del from 'del';
 import gulpPostcss from 'gulp-postcss';
 import postcssScss from 'postcss-scss';
@@ -22,22 +25,122 @@ import nodeSass from 'node-sass';
 import fse from 'fs-extra';
 import textMetrics from './src/index';
 import parser from './src/lib/parser';
+import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import fontMetrics from 'font-metrics';
 import runSequence from 'run-sequence';
+import precss from 'precss';
+import postcssPartialImport from 'postcss-partial-import';
+import cssnano from 'cssnano';
+import cssMqPacker from 'css-mqpacker';
 
 const source = {
 	css: './example/src/css/**/*.css',
 	cssTypography: './example/src/css-typography/css-typography.css',
 	scss: './example/src/scss/**/*.scss',
 	scssTypography: './example/src/scss-typography/scss-typography.scss',
-	fontMetricsSrc: './example/dist/font-metrics/font-metrics.json'
+	fontMetricsSrc: './example/font-metrics/font-metrics.json'
 };
 
 const output = {
-	css: './example/dist/css',
-	scss: './example/dist/scss',
+	gulp: {
+		css: './example/dist/gulp/css',
+		scss: './example/dist/gulp/scss'
+	},
+	webpack: {
+		css: './example/dist/webpack/css',
+		scss: './example/dist/webpack/scss'
+	},
 	fontMetrics: './example/dist/font-metrics'
 };
+
+const cssnanoPlugin = cssnano({
+	autoprefixer: false,
+	colormin: false,
+	core: false,
+	discardDuplicates: false,
+	discardOverridden: false,
+	calc: false,
+	convertValues: false,
+	discardComments: true,
+	discardEmpty: false,
+	discardUnused: false,
+	mergeIdents: false,
+	mergeRules: true,
+	minifyGradients: false,
+	minifySelectors: false,
+	normalizeUrl: false,
+	reduceBackgroundRepeat: false,
+	reduceIdents: false,
+	filterOptimiser: false,
+	functionOptimiser: false,
+	mergeLonghand: false,
+	minifyFontValues: false,
+	minifyParams: false,
+	normalizeCharset: false,
+	orderedValues: false,
+	reduceDisplayValues: false,
+	reduceInitial: false,
+	reduceTimingFunctions: false,
+	styleCache: false,
+	uniqueSelectors: false,
+	reducePositions: false,
+	reduceTransforms: false,
+	svgo: false,
+	zindex: false
+});
+
+const scssData = nodeSass.renderSync({
+	file: source.scssTypography
+}).css.toString();
+const parsedScssData = parseTypography(scssData);
+const scssTextMetricsPlugin = textMetrics({
+	corrections: parsedScssData,
+	plainCSS: false
+});
+
+const webpackExampleConfig = {
+	entry: {
+		index: path.resolve(__dirname, 'example/webpack-index-example.js')
+	},
+	output: {
+		path: path.resolve(__dirname, 'example/dist/webpack/'),
+		filename: '[name].js',
+	},
+	module: {
+		rules: [{
+			test: /\.(css|scss)$/,
+			use: ExtractTextPlugin.extract({
+				fallback: 'style-loader',
+				use: [{
+					loader: 'css-loader'
+				}, {
+					loader: 'postcss-loader',
+					options: {
+						plugins: [
+							cssnanoPlugin,
+							cssMqPacker()
+						]
+					}
+				}, {
+					loader: 'sass-loader',
+					options: {
+						outputStyle: 'expanded'
+					}
+				}, {
+					loader: 'postcss-loader',
+					options: {
+						ident: 'postcss',
+						plugins: [postcssPartialImport(), scssTextMetricsPlugin],
+						parser: postcssScss
+					}
+				}]
+			})
+		}]
+	},
+	plugins: [
+		new ExtractTextPlugin('[name].css')
+	]
+}
 
 function getFontMetricsData () {
 	let metrics;
@@ -73,20 +176,20 @@ gulp.task('fonts:parse', () => {
 	fontParser.parse();
 });
 
-gulp.task('compile:css', () => {
+gulp.task('compile:css-gulp', () => {
 	const cssData = fse.readFileSync(source.cssTypography, 'utf8');
 	const parsedCSSData = parseTypography(cssData);
 	const cssTextMetricsPlugin = textMetrics({
 		corrections: parsedCSSData
 	});
 
-	del(`${output.css}/*`);
+	del(`${output.gulp.css}/*`);
 	gulp.src(source.css)
 		.pipe(gulpPostcss([cssTextMetricsPlugin]))
-		.pipe(gulp.dest(output.css));
+		.pipe(gulp.dest(output.gulp.css));
 });
 
-gulp.task('compile:scss', () => {
+gulp.task('compile:scss-gulp', () => {
 	const scssData = nodeSass.renderSync({
 		file: source.scssTypography
 	}).css.toString();
@@ -96,9 +199,9 @@ gulp.task('compile:scss', () => {
 		plainCSS: false
 	});
 
-	del(`${output.scss}/*`);
+	del(`${output.gulp.scss}/*`);
 	gulp.src(source.scss)
-		.pipe(gulpPostcss([scssTextMetricsPlugin]), {
+		.pipe(gulpPostcss([postcssPartialImport(), scssTextMetricsPlugin]), {
 			parser: postcssScss
 		})
 		.pipe(sass({
@@ -107,7 +210,38 @@ gulp.task('compile:scss', () => {
 			console.log(err);
 			this.emit('end');
 		})
-		.pipe(gulp.dest(output.scss));
+		.pipe(gulpPostcss([cssnanoPlugin, cssMqPacker()]))
+		.pipe(gulp.dest(output.gulp.scss));
+});
+
+gulp.task('compile:scss-webpack', () => {
+	const scssData = nodeSass.renderSync({
+		file: source.scssTypography
+	}).css.toString();
+	const parsedScssData = parseTypography(scssData);
+	const scssTextMetricsPlugin = textMetrics({
+		corrections: parsedScssData,
+		plainCSS: false
+	});
+
+	const webpackConfig = Object.create(webpackExampleConfig);
+	webpackConfig.plugins = webpackConfig.plugins.concat([
+		scssTextMetricsPlugin
+	]);
+
+	del(`${output.webpack.scss}/*`);
+
+	gulp.src(source.scss)
+		.pipe(gulpWebpack(webpackExampleConfig, webpack))
+		.pipe(gulp.dest(output.webpack.scss))
+});
+
+gulp.task('compile:scss', () => {
+	runSequence(['compile:scss-gulp', 'compile:scss-webpack']);
+});
+
+gulp.task('compile:css', () => {
+	runSequence(['compile:css-gulp']);
 });
 
 gulp.task('compile:all', () => {
@@ -115,15 +249,21 @@ gulp.task('compile:all', () => {
 });
 
 gulp.task('watch:css', () => {
-	gulp.watch(source.css, ['compile:css']);
+	gulp.watch(source.css, ['compile:css-gulp']);
 });
 
 gulp.task('watch:scss', () => {
-	gulp.watch(source.scss, ['compile:scss']);
+	gulp.watch(source.scss, ['compile:scss-gulp', 'compile:scss-webpack']);
+});
+
+gulp.task('clean', () => {
+	del(`${output.gulp.css}/*`);
+	del(`${output.gulp.scss}/*`);
+	del(`${output.webpack.scss}/*`);
 });
 
 gulp.task('watch:all', () => {
 	console.log('Not implemented');
 });
 
-gulp.task('default', ['compile:css', 'watch:css', 'compile:scss', 'watch:scss']);
+gulp.task('default', ['compile:css-gulp', 'watch:css-gulp', 'compile:scss-gulp', 'watch:scss-gulp']);
