@@ -1,11 +1,23 @@
-$paddingTop: 24px;
-/*! sss1*/
-.simple-rule {
-	padding-top: $paddingTop /* {$paddingTop, .p1}*/;
-	transform: translateX(24px) /* translateX({24px, .p1})*/;
-	
-	.nested-rule-inside-simple-rule {
-		margin-bottom: 24px /* {24px, .p1}*/;
-		transform: translateY(24px) /* translateY({24px, .p1})*/;
+@import 'partials/_example_partial.scss';
+
+/*! Import separator */
+
+$topOffset: 24px;
+
+.rule {
+	padding-top: $topOffset /* {$topOffset, .p1} */;
+}
+
+.parent-rule .rule {
+	margin-top: $topOffset /* {$topOffset, .p1, h1} */;
+}
+
+@media (min-width: 1499px) {
+	.rule-inside-media {
+		transform: translateY($topOffset) /* translateY({$topOffset, .p1, h1})*/;
+	}
+
+	.parent-rule .rule-inside-media {
+		top: $topOffset /* {$topOffset, .p1, h1} */;
 	}
 }

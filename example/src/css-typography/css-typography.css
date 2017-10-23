@@ -5,12 +5,8 @@
     font-family: Arial;
 }
 
-.p2,
-.p3 {
-    /* multiple selectors */
-    font-size: 12px;
-    line-height: 18px;
-    font-family: Arial;
+h1 {
+    font: 12px/18px Arial;
 }
 
 @media (min-width: 1499px) {
@@ -29,6 +25,14 @@ html[lang="ko"] .p1 {
     font-family: Arial;
 }
 
+.p2,
+.p3 {
+    /* multiple selectors */
+    font-size: 12px;
+    line-height: 18px;
+    font-family: Arial;
+}
+
 @media (min-width: 1499px) {
     /* atRule + selector based correction data */
     html[lang="en"] .p1 {
@@ -36,4 +40,3 @@ html[lang="ko"] .p1 {
         line-height: 26px;
     }
 }
-

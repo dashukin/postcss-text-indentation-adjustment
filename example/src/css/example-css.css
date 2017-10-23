@@ -1,15 +1,17 @@
-.simple-rule {
+.rule {
 	padding-top: 24px /* {24px, .p1} */;
 }
 
-.simple-rule .nested-rule-inside-simple-rule {
-	margin-bottom: 24px /* {24px, .p1} */;
-	transform: translateY(24px) /* translateY({24px, .p1})*/;
+.parent-rule .rule {
+	margin-top: 24px /* {24px, .p1, h1} */;
 }
 
-@media (max-width: 1499px) {
-	.simple-rule {
-		margin-bottom: 24px /* {24px, .p1} */;
-		transform: translateY(24px) /* translateY({24px, .p1}) */;
+@media (min-width: 1499px) {
+	.rule-inside-media {
+		transform: translateY(24px) /* translateY({24px, .p1, h1})*/;
+	}
+
+	.parent-rule .rule-inside-media {
+		top: 24px /* {24px, .p1, h1} */;
 	}
 }
