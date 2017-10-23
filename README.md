@@ -9,7 +9,7 @@ PostCSS plugin for adjusting measurements or position values like padding, margi
 #### Example
 
 ##### Core typography
-```scss
+```css
 .p1 {
     /* pure correction data */
     font-size: 12px;
@@ -56,7 +56,7 @@ html[lang="ko"] .p1 {
 ```
 
 ##### CSS Input 
-```scss
+```css
 .rule {
 	padding-top: 24px /* {24px, .p1} */;
 }
