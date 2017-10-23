@@ -1,22 +1,25 @@
 {
   "name": "postcss-text-metrics",
-  "version": "0.1.0",
-  "description": "Adjust padding/margin/translate/etc  values on text metrics gaps",
+  "version": "1.0.0",
+  "description": "Adjust padding/margin/translate/etc values on text metrics gaps",
   "main": "index.js",
   "scripts": {
+    "build": "webpack",
     "fonts:parse": "node ./node_modules/gulp/bin/gulp fonts:parse",
     "compile:css": "node ./node_modules/gulp/bin/gulp compile:css",
     "compile:scss": "node ./node_modules/gulp/bin/gulp compile:scss",
     "compile:all": "node ./node_modules/gulp/bin/gulp compile:all",
+    "clean": "node ./node_modules/gulp/bin/gulp clean",
     "test": "jest"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dashukin/postcss-text-metrics.git"
+    "url": "git+https://github.com/dashukin/postcss-text-indentation-adjustment.git"
   },
   "keywords": [
     "postcss",
     "css",
+    "postcss-plugin",
     "text",
     "metrics",
     "font",
@@ -26,9 +29,9 @@
   "author": "Vasili Molakhau <dashukin@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/dashukin/postcss-text-metrics/issues"
+    "url": "https://github.com/dashukin/postcss-text-indentation-adjustment/issues"
   },
-  "homepage": "https://github.com/dashukin/postcss-text-metrics#readme",
+  "homepage": "https://github.com/dashukin/postcss-text-indentation-adjustment#readme",
   "dependencies": {
     "lodash": "^4.17.4",
     "postcss": "^6.0.6",
@@ -39,19 +42,31 @@
     "babel-core": "^6.24.0",
     "babel-loader": "^7.1.2",
     "babel-preset-latest": "^6.24.0",
+    "css-loader": "^0.28.7",
+    "css-mqpacker": "^6.0.1",
+    "cssnano": "^3.10.0",
     "del": "^2.2.2",
     "electron": "^1.7.8",
+    "extract-text-webpack-plugin": "^3.0.1",
     "font-metrics": "^0.4.2",
     "fs-extra": "^2.1.2",
     "gulp": "^3.9.1",
     "gulp-cli": "^1.2.2",
     "gulp-postcss": "^7.0.0",
     "gulp-sass": "^3.1.0",
+    "gulp-webpack": "^1.5.0",
     "jest": "^19.0.2",
     "node-sass": "^4.5.2",
     "postcss-cli": "^3.1.1",
+    "postcss-loader": "^2.0.8",
+    "postcss-partial-import": "^4.1.0",
+    "postcss-sassy-import": "^1.2.3",
     "postcss-scss": "^1.0.2",
+    "postcss-variables": "^1.1.1",
+    "precss": "^2.0.0",
     "run-sequence": "^2.2.0",
+    "sass-loader": "^6.0.6",
+    "style-loader": "^0.19.0",
     "webpack": "^3.6.0"
   }
 }
