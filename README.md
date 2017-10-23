@@ -8,7 +8,7 @@ PostCSS plugin for adjusting measurements or position values like padding, margi
 
 #### Example
 
-##### Core typography
+##### Core typography (describes base rules for main typography elements. Can be either classNames or tags)
 ```css
 .p1 {
     /* pure correction data */
