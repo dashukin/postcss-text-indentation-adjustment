@@ -55,7 +55,8 @@ html[lang="ko"] .p1 {
 
 ```
 
-##### CSS Input 
+##### CSS Input.
+Example styles that should receive corrections based on core styles.
 ```css
 .rule {
 	padding-top: 24px /* {24px, .p1} */;
@@ -76,7 +77,9 @@ html[lang="ko"] .p1 {
 }
 ```
 
-##### CSS Output (without grouping media queries, rules and declarations)
+##### CSS Output 
+Parsed css output (before without grouping media queries, rules and declarations).
+Each declaration value with previously set correction template has been corrected for line-height, text rendering box gap and diacritics values of every used classname declared in core typography file.
 ```css
 .inner-partial-rule {
   padding-top: 14px;
