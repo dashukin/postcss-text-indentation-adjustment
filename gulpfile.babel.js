@@ -53,6 +53,15 @@ const output = {
 	fontMetrics: './example/dist/font-metrics'
 };
 
+const scssData = nodeSass.renderSync({
+	file: source.scssTypography
+}).css.toString();
+const parsedScssData = parseTypography(scssData);
+const scssTextMetricsPlugin = textMetrics({
+	corrections: parsedScssData,
+	plainCSS: false
+});
+
 const cssnanoPlugin = cssnano({
 	autoprefixer: false,
 	colormin: false,
@@ -87,15 +96,6 @@ const cssnanoPlugin = cssnano({
 	reduceTransforms: false,
 	svgo: false,
 	zindex: false
-});
-
-const scssData = nodeSass.renderSync({
-	file: source.scssTypography
-}).css.toString();
-const parsedScssData = parseTypography(scssData);
-const scssTextMetricsPlugin = textMetrics({
-	corrections: parsedScssData,
-	plainCSS: false
 });
 
 const webpackExampleConfig = {
@@ -185,7 +185,11 @@ gulp.task('compile:css-gulp', () => {
 
 	del(`${output.gulp.css}/*`);
 	gulp.src(source.css)
-		.pipe(gulpPostcss([cssTextMetricsPlugin]))
+		.pipe(gulpPostcss([
+			cssTextMetricsPlugin,
+			cssnanoPlugin,
+			cssMqPacker()
+		]))
 		.pipe(gulp.dest(output.gulp.css));
 });
 
@@ -210,7 +214,10 @@ gulp.task('compile:scss-gulp', () => {
 			console.log(err);
 			this.emit('end');
 		})
-		.pipe(gulpPostcss([cssnanoPlugin, cssMqPacker()]))
+		.pipe(gulpPostcss([
+			cssnanoPlugin,
+			cssMqPacker()
+		]))
 		.pipe(gulp.dest(output.gulp.scss));
 });
 
