@@ -6,9 +6,9 @@ PostCSS plugin for adjusting measurements or position values like padding, margi
 1. Support automatic creation of any dependend rules based on media queries, localizations or any specific parent selectors defined for common typography styles.
 1. Support CSS, SCSS or whatever syntax postcss can handle via appropriate parser. 
 
-#### Example
+## Example
 
-##### Core typography 
+### Core typography 
 Describes base rules for main typography elements. Can be either classNames or tags.
 ```css
 .p1 {
@@ -56,7 +56,7 @@ html[lang="ko"] .p1 {
 
 ```
 
-##### CSS Input.
+### CSS Input.
 Example styles that should receive corrections based on core styles.
 ```css
 .rule {
@@ -78,7 +78,7 @@ Example styles that should receive corrections based on core styles.
 }
 ```
 
-##### CSS Output (unoptimized)
+### CSS Output (unoptimized)
 Parsed css output (before without grouping media queries, rules and declarations).
 Each declaration value with previously set correction template has been corrected for line-height, text rendering box gap and diacritics values of every used classname declared in core typography file.
 ```css
@@ -184,7 +184,7 @@ html[lang="ko"] .parent-rule .rule-inside-media {
 
 ```
 
-##### CSS Output (optimized)
+### CSS Output (optimized)
 With grouping media queries, rules and declarations.
 ```css
 .rule{
