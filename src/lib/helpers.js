@@ -90,5 +90,7 @@ function trim (input = '') {
 }
 
 export const makeStringOneLine = (str = '') => {
-	return trim(str.replace(/\n/g, '').replace(/\s+/g, ' '));
+	let result = trim(str.replace(/\n/gm, '').replace(/\s+/g, ' '));
+
+	return result;
 };

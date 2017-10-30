@@ -14,7 +14,7 @@
 
 import postcss from 'postcss';
 import postcsssTextMetrics from './text-metrics';
-import {makeStringOneLine} from './helpers';
+import {minify} from 'sqwish';
 
 const textMetricsPlugin = postcsssTextMetrics({
 	dotReplacement: '%dot%',
@@ -704,7 +704,7 @@ describe('Text-metrics plugin', () => {
 				}
 			`;
 			const processed = processCSS(css);
-			expect(makeStringOneLine(processed)).toBe(makeStringOneLine(expected));
+			expect(minify(processed)).toBe(minify(expected));
 		});
 		
 		
@@ -725,7 +725,7 @@ describe('Text-metrics plugin', () => {
 				}
 			`;
 			const processed = processCSS(css);
-			expect(makeStringOneLine(processed)).toBe(makeStringOneLine(expected));
+			expect(minify(processed)).toBe(minify(expected));
 		});
 		
 		
@@ -751,7 +751,7 @@ describe('Text-metrics plugin', () => {
 				}
 			`;
 			const processed = processCSS(css);
-			expect(makeStringOneLine(processed)).toBe(makeStringOneLine(expected));
+			expect(minify(processed)).toBe(minify(expected));
 		});
 		
 	});
