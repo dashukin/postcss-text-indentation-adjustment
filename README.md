@@ -8,7 +8,8 @@ PostCSS plugin for adjusting measurements or position values like padding, margi
 
 #### Example
 
-##### Core typography (describes base rules for main typography elements. Can be either classNames or tags)
+##### Core typography 
+Describes base rules for main typography elements. Can be either classNames or tags.
 ```css
 .p1 {
     /* pure correction data */
@@ -77,206 +78,173 @@ Example styles that should receive corrections based on core styles.
 }
 ```
 
-##### CSS Output 
+##### CSS Output (unoptimized)
 Parsed css output (before without grouping media queries, rules and declarations).
 Each declaration value with previously set correction template has been corrected for line-height, text rendering box gap and diacritics values of every used classname declared in core typography file.
 ```css
-.inner-partial-rule {
-  padding-top: 14px;
-}
-
-.partial-rule {
-  pading-top: 14px;
-}
-
 .rule {
-  padding-top: 19px;
+	padding-top: 19px;
 }
 
 .parent-rule .rule {
-  margin-top: 19px;
+	margin-top: 14px;
 }
 
 @media (min-width: 1499px) {
-  .rule-inside-media {
-    transform: translateY(19px);
-  }
-  .parent-rule .rule-inside-media {
-    top: 19px;
-  }
-  html[lang="en"] .rule-inside-media {
-    transform: translateY(18px);
-  }
-  html[lang="ko"] .rule-inside-media {
-    transform: translateY(18px);
-  }
-}
+	.rule-inside-media {
+		transform: translateY(14px);
+	}
 
-@media (min-width: 1499px) and (min-width: 1499px) {
-  .rule-inside-media {
-    transform: translateY(21px);
-  }
-}
-
-@media (min-width: 1499px) {
-  html[lang="en"] .parent-rule .rule-inside-media {
-    top: 18px;
-  }
-  html[lang="ko"] .parent-rule .rule-inside-media {
-    top: 18px;
-  }
-}
-
-@media (min-width: 1499px) and (min-width: 1499px) {
-  .parent-rule .rule-inside-media {
-    top: 21px;
-  }
-}
-
-html[lang="en"] .inner-partial-rule {
-  padding-top: 13px;
-}
-
-html[lang="ko"] .inner-partial-rule {
-  padding-top: 13px;
-}
-
-@media (min-width: 1499px) {
-  .inner-partial-rule {
-    padding-top: 16px;
-  }
-}
-
-@media (min-width: 1499px) {
-  html[lang="en"] .inner-partial-rule {
-    padding-top: 21px;
-  }
-}
-
-html[lang="en"] .partial-rule {
-  pading-top: 13px;
-}
-
-html[lang="ko"] .partial-rule {
-  pading-top: 13px;
-}
-
-@media (min-width: 1499px) {
-  .partial-rule {
-    pading-top: 16px;
-  }
-}
-
-@media (min-width: 1499px) {
-  html[lang="en"] .partial-rule {
-    pading-top: 21px;
-  }
+	.parent-rule .rule-inside-media {
+		top: 14px;
+	}
 }
 
 html[lang="en"] .rule {
-  padding-top: 18px;
+	padding-top: 18px;
 }
 
 html[lang="ko"] .rule {
-  padding-top: 18px;
+	padding-top: 18px;
 }
 
-@media (min-width: 1499px) {
-  .rule {
-    padding-top: 21px;
-  }
+@media (min-width: 1499px) {.rule {
+		padding-top: 19px;
+}
+}
+
+@media (min-width: 1499px) {html[lang="en"] .rule {
+		padding-top: 18px;
+}
 }
 
 html[lang="en"] .parent-rule .rule {
-  margin-top: 18px;
+	margin-top: 13px;
 }
 
 html[lang="ko"] .parent-rule .rule {
-  margin-top: 18px;
+	margin-top: 13px;
 }
 
 @media (min-width: 1499px) {
-  .parent-rule .rule {
-    margin-top: 21px;
-  }
+
+.parent-rule .rule {
+		margin-top: 14px;
+}
+}
+
+@media (min-width: 1499px) {
+
+html[lang="en"] .parent-rule .rule {
+		margin-top: 18px;
+}
+}
+
+html[lang="en"] .rule-inside-media {
+	transform: translateY(13px);
+	}
+
+html[lang="ko"] .rule-inside-media {
+	transform: translateY(13px);
+	}
+
+@media (min-width: 1499px) {
+	.rule-inside-media {
+		transform: translateY(14px);
+	}
+}
+
+@media (min-width: 1499px) {
+	html[lang="en"] .rule-inside-media {
+		transform: translateY(18px);
+	}
+}
+
+html[lang="en"] .parent-rule .rule-inside-media {
+	top: 13px;
+	}
+
+html[lang="ko"] .parent-rule .rule-inside-media {
+	top: 13px;
+	}
+
+@media (min-width: 1499px) {
+
+	.parent-rule .rule-inside-media {
+		top: 14px;
+	}
+}
+
+@media (min-width: 1499px) {
+
+	html[lang="en"] .parent-rule .rule-inside-media {
+		top: 18px;
+	}
 }
 
 ```
 
-##### CSS Output (with grouping media queries, rules and declarations)
+##### CSS Output (optimized)
+With grouping media queries, rules and declarations.
 ```css
-.inner-partial-rule{
-  padding-top:14px;
-}
-
-.partial-rule{
-  pading-top:14px;
-}
-
 .rule{
-  padding-top:19px;
+	padding-top:19px;
 }
 
 .parent-rule .rule{
-  margin-top:19px;
-}
-
-html[lang="en"] .inner-partial-rule,html[lang="ko"] .inner-partial-rule{
-  padding-top:13px;
-}
-
-html[lang="en"] .partial-rule,html[lang="ko"] .partial-rule{
-  pading-top:13px;
+	margin-top:14px;
 }
 
 html[lang="en"] .rule,html[lang="ko"] .rule{
-  padding-top:18px;
+	padding-top:18px;
 }
 
 html[lang="en"] .parent-rule .rule,html[lang="ko"] .parent-rule .rule{
-  margin-top:18px;
+	margin-top:13px;
 }
+
+html[lang="en"] .rule-inside-media,html[lang="ko"] .rule-inside-media{
+	transform:translateY(13px);
+	}
+
+html[lang="en"] .parent-rule .rule-inside-media,html[lang="ko"] .parent-rule .rule-inside-media{
+	top:13px;
+	}
 
 @media (min-width: 1499px){
-  .rule-inside-media{
-    transform:translateY(19px);
-  }
-  .parent-rule .rule-inside-media{
-    top:19px;
-  }
-  html[lang="en"] .rule-inside-media,html[lang="ko"] .rule-inside-media{
-    transform:translateY(18px);
-  }
-  html[lang="en"] .parent-rule .rule-inside-media,html[lang="ko"] .parent-rule .rule-inside-media{
-    top:18px;
-  }
-  .inner-partial-rule{
-    padding-top:16px;
-  }
-  html[lang="en"] .inner-partial-rule{
-    padding-top:21px;
-  }
-  .partial-rule{
-    pading-top:16px;
-  }
-  html[lang="en"] .partial-rule{
-    pading-top:21px;
-  }
-  .rule{
-    padding-top:21px;
-  }
-  .parent-rule .rule{
-    margin-top:21px;
-  }
+	.rule-inside-media{
+		transform:translateY(14px);
+	}
+
+	.parent-rule .rule-inside-media{
+		top:14px;
+	}.rule{
+		padding-top:19px;
+}html[lang="en"] .rule{
+		padding-top:18px;
 }
 
-@media (min-width: 1499px) and (min-width: 1499px){
-  .rule-inside-media{
-    transform:translateY(21px);
-  }
-  .parent-rule .rule-inside-media{
-    top:21px;
-  }
+.parent-rule .rule{
+		margin-top:14px;
+}
+
+html[lang="en"] .parent-rule .rule{
+		margin-top:18px;
+}
+	.rule-inside-media{
+		transform:translateY(14px);
+	}
+	html[lang="en"] .rule-inside-media{
+		transform:translateY(18px);
+	}
+
+	.parent-rule .rule-inside-media{
+		top:14px;
+	}
+
+	html[lang="en"] .parent-rule .rule-inside-media{
+		top:18px;
+	}
 }
 
 ```
