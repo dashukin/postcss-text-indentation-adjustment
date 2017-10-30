@@ -597,8 +597,8 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 			}
 
 			const {selector: ruleSelector, raws: ruleRaws} = rule;
-			const hasParentRule = rule.parent !== rule.root();
-			const ampersandValue = plainCSS || !hasParentRule ? '' : '&';
+			const hasParentRule = rule.parent !== rule.root() && rule.parent.type === 'rule';
+			const ampersandValue = hasParentRule ? '&' : '';
 
 			// create array of declaration values even if only one object has been passed.
 			declarationValue = [].concat(declarationValue);
@@ -639,7 +639,9 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 					});
 
 					// create new nested rule
-					const newRule = new postCSS.rule();
+					const newRule = rule.clone();
+					newRule.removeAll();
+
 					// update rules selector
 					newRule.selector = `${selector} ${ampersandValue} ${ruleSelector}`.replace(/\s{2,}/gi, ' ');
 					newRule.append(additionalRuleDeclaration);
@@ -647,7 +649,11 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 					newRule.raws.after = ruleRaws.after;
 
 					// insert newly created rule into node.
-					rule.parent.append(newRule);
+					if (hasParentRule) {
+						rule.parent.append(newRule);
+					} else {
+						rule.root().append(newRule);
+					}
 				} else if (!selector && atRule) {
 					// atRule based correction
 					const {name: atRuleName, params: atRuleParams} = atRule;
@@ -655,18 +661,18 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 
 					newAtRule.name = atRuleName;
 					newAtRule.params = atRuleParams;
-					newAtRule.raws.before = ruleRaws.before;
-					newAtRule.raws.after = ruleRaws.after;
 
 					const declaration = new postCSS.decl({
 						prop: declarationProperty,
 						value
 					});
 
-					const newRule = new postCSS.rule();
+					const newRule = rule.clone();
+					newRule.removeAll();
+
 					newRule.selector = ruleSelector;
 
-					rule.parent.append(newAtRule);
+					rule.root().append(newAtRule);
 					newAtRule.append(newRule);
 					newRule.append(declaration);
 
@@ -677,10 +683,12 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 
 					newAtRule.name = atRuleName;
 					newAtRule.params = atRuleParams;
-					newAtRule.raws.before = ruleRaws.before;
-					newAtRule.raws.after = ruleRaws.after;
 
-					const newRule = new postCSS.rule();
+					const newRule = rule.clone();
+					newRule.removeAll();
+
+					newRule.raws.before = ruleRaws.before;
+					newRule.raws.after = ruleRaws.after;
 
 					newRule.selector = `${selector} ${ampersandValue} ${ruleSelector}`.replace(/\s{2,}/gi, ' ');
 
@@ -689,7 +697,7 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 						value
 					});
 
-					rule.parent.append(newAtRule);
+					rule.root().append(newAtRule);
 					newAtRule.append(newRule);
 
 					newRule.append(declaration);
