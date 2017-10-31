@@ -645,8 +645,8 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 					// update rules selector
 					newRule.selector = `${selector} ${ampersandValue} ${ruleSelector}`.replace(/\s{2,}/gi, ' ');
 					newRule.append(additionalRuleDeclaration);
-					newRule.raws.before = ruleRaws.before;
-					newRule.raws.after = ruleRaws.after;
+					newRule.raws.before = '\n\t';
+					newRule.raws.after = '\n';
 
 					// insert newly created rule into node.
 					if (hasParentRule) {
@@ -669,8 +669,9 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 
 					const newRule = rule.clone();
 					newRule.removeAll();
-
 					newRule.selector = ruleSelector;
+					newRule.raws.before = '\n\t';
+					newRule.raws.after = '\n\t';
 
 					rule.root().append(newAtRule);
 					newAtRule.append(newRule);
@@ -683,12 +684,14 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 
 					newAtRule.name = atRuleName;
 					newAtRule.params = atRuleParams;
+					// newAtRule.raws.before = ruleRaws.before;
+					// newAtRule.raws.after = ruleRaws.after;
 
 					const newRule = rule.clone();
 					newRule.removeAll();
 
-					newRule.raws.before = ruleRaws.before;
-					newRule.raws.after = ruleRaws.after;
+					newRule.raws.before = '\n\t';
+					newRule.raws.after = '\n\t';
 
 					newRule.selector = `${selector} ${ampersandValue} ${ruleSelector}`.replace(/\s{2,}/gi, ' ');
 
