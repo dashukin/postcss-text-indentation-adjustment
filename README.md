@@ -108,14 +108,16 @@ html[lang="ko"] .rule {
 	padding-top: 18px;
 }
 
-@media (min-width: 1499px) {.rule {
+@media (min-width: 1499px) {
+	.rule {
 		padding-top: 19px;
-}
+	}
 }
 
-@media (min-width: 1499px) {html[lang="en"] .rule {
+@media (min-width: 1499px) {
+	html[lang="en"] .rule {
 		padding-top: 18px;
-}
+	}
 }
 
 html[lang="en"] .parent-rule .rule {
@@ -127,26 +129,24 @@ html[lang="ko"] .parent-rule .rule {
 }
 
 @media (min-width: 1499px) {
-
-.parent-rule .rule {
+	.parent-rule .rule {
 		margin-top: 14px;
-}
+	}
 }
 
 @media (min-width: 1499px) {
-
-html[lang="en"] .parent-rule .rule {
+	html[lang="en"] .parent-rule .rule {
 		margin-top: 18px;
-}
+	}
 }
 
 html[lang="en"] .rule-inside-media {
 	transform: translateY(13px);
-	}
+}
 
 html[lang="ko"] .rule-inside-media {
 	transform: translateY(13px);
-	}
+}
 
 @media (min-width: 1499px) {
 	.rule-inside-media {
@@ -162,21 +162,19 @@ html[lang="ko"] .rule-inside-media {
 
 html[lang="en"] .parent-rule .rule-inside-media {
 	top: 13px;
-	}
+}
 
 html[lang="ko"] .parent-rule .rule-inside-media {
 	top: 13px;
-	}
+}
 
 @media (min-width: 1499px) {
-
 	.parent-rule .rule-inside-media {
 		top: 14px;
 	}
 }
 
 @media (min-width: 1499px) {
-
 	html[lang="en"] .parent-rule .rule-inside-media {
 		top: 18px;
 	}
@@ -205,11 +203,11 @@ html[lang="en"] .parent-rule .rule,html[lang="ko"] .parent-rule .rule{
 
 html[lang="en"] .rule-inside-media,html[lang="ko"] .rule-inside-media{
 	transform:translateY(13px);
-	}
+}
 
 html[lang="en"] .parent-rule .rule-inside-media,html[lang="ko"] .parent-rule .rule-inside-media{
 	top:13px;
-	}
+}
 
 @media (min-width: 1499px){
 	.rule-inside-media{
@@ -218,30 +216,28 @@ html[lang="en"] .parent-rule .rule-inside-media,html[lang="ko"] .parent-rule .ru
 
 	.parent-rule .rule-inside-media{
 		top:14px;
-	}.rule{
+	}
+	.rule{
 		padding-top:19px;
-}html[lang="en"] .rule{
+	}
+	html[lang="en"] .rule{
 		padding-top:18px;
-}
-
-.parent-rule .rule{
+	}
+	.parent-rule .rule{
 		margin-top:14px;
-}
-
-html[lang="en"] .parent-rule .rule{
+	}
+	html[lang="en"] .parent-rule .rule{
 		margin-top:18px;
-}
+	}
 	.rule-inside-media{
 		transform:translateY(14px);
 	}
 	html[lang="en"] .rule-inside-media{
 		transform:translateY(18px);
 	}
-
 	.parent-rule .rule-inside-media{
 		top:14px;
 	}
-
 	html[lang="en"] .parent-rule .rule-inside-media{
 		top:18px;
 	}
