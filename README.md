@@ -9,7 +9,7 @@ PostCSS plugin for adjusting measurements or position values like padding, margi
 ## Example
 
 ### Core typography 
-Describes base rules for main typography elements. Can be either classNames or tags.
+Describes **base rules for main typography elements**. Can be either classNames or tags.
 ```css
 .p1 {
     /* pure correction data */
@@ -57,7 +57,7 @@ html[lang="ko"] .p1 {
 ```
 
 ### CSS Input.
-Example styles that should receive corrections based on core styles.
+Example styles that should receive corrections **based on core styles**.
 ```css
 .rule {
 	padding-top: 24px /* {24px, .p1} */;
@@ -79,8 +79,8 @@ Example styles that should receive corrections based on core styles.
 ```
 
 ### CSS Output (unoptimized)
-Parsed css output (before without grouping media queries, rules and declarations).
-Each declaration value with previously set correction template has been corrected for line-height, text rendering box gap and diacritics values of every used classname declared in core typography file.
+Parsed css output (before grouping media queries, rules and declarations).
+Each declaration value with previously set correction template has been **corrected for line-height, text rendering box gap and diacritics values of every used classname declared in core typography file**.
 ```css
 .rule {
 	padding-top: 19px;
