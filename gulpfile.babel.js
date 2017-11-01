@@ -28,10 +28,9 @@ import parser from './src/lib/parser';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import fontMetrics from 'font-metrics';
 import runSequence from 'run-sequence';
-import precss from 'precss';
 import postcssPartialImport from 'postcss-partial-import';
-import cssnano from 'cssnano';
 import cssMqPacker from 'css-mqpacker';
+import mergeRules from 'postcss-merge-rules';
 
 const source = {
 	css: './example/src/css/**/*.css',
@@ -62,42 +61,6 @@ const scssTextMetricsPlugin = textMetrics({
 	plainCSS: false
 });
 
-const cssnanoPlugin = cssnano({
-	autoprefixer: false,
-	colormin: false,
-	core: false,
-	discardDuplicates: false,
-	discardOverridden: false,
-	calc: false,
-	convertValues: false,
-	discardComments: true,
-	discardEmpty: false,
-	discardUnused: false,
-	mergeIdents: false,
-	mergeRules: true,
-	minifyGradients: false,
-	minifySelectors: false,
-	normalizeUrl: false,
-	reduceBackgroundRepeat: false,
-	reduceIdents: false,
-	filterOptimiser: false,
-	functionOptimiser: false,
-	mergeLonghand: false,
-	minifyFontValues: false,
-	minifyParams: false,
-	normalizeCharset: false,
-	orderedValues: false,
-	reduceDisplayValues: false,
-	reduceInitial: false,
-	reduceTimingFunctions: false,
-	styleCache: false,
-	uniqueSelectors: false,
-	reducePositions: false,
-	reduceTransforms: false,
-	svgo: false,
-	zindex: false
-});
-
 const webpackExampleConfig = {
 	entry: {
 		index: path.resolve(__dirname, 'example/webpack-index-example.js')
@@ -117,7 +80,7 @@ const webpackExampleConfig = {
 					loader: 'postcss-loader',
 					options: {
 						plugins: [
-							cssnanoPlugin,
+							mergeRules(),
 							cssMqPacker()
 						]
 					}
@@ -187,7 +150,7 @@ gulp.task('compile:css-gulp', () => {
 	gulp.src(source.css)
 		.pipe(gulpPostcss([
 			cssTextMetricsPlugin,
-			cssnanoPlugin,
+			mergeRules(),
 			cssMqPacker()
 		]))
 		.pipe(gulp.dest(output.gulp.css));
@@ -215,7 +178,7 @@ gulp.task('compile:scss-gulp', () => {
 			this.emit('end');
 		})
 		.pipe(gulpPostcss([
-			cssnanoPlugin,
+			mergeRules(),
 			cssMqPacker()
 		]))
 		.pipe(gulp.dest(output.gulp.scss));
