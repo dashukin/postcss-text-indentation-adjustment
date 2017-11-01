@@ -165,8 +165,8 @@ describe('Text-metrics plugin', () => {
 			`;
 			
 			const processed = processCSS(css);
-			
-			expect(processed).toBe(expected);
+
+			expect(minify(processed)).toBe(minify(expected));
 		});
 		
 		
@@ -191,8 +191,8 @@ describe('Text-metrics plugin', () => {
 			`;
 			
 			const processed = processCSS(css);
-			
-			expect(processed).toBe(expected);
+
+			expect(minify(processed)).toBe(minify(expected));
 		});
 		
 		
@@ -217,8 +217,8 @@ describe('Text-metrics plugin', () => {
 			`;
 			
 			const processed = processCSS(css);
-			
-			expect(processed).toBe(expected);
+
+			expect(minify(processed)).toBe(minify(expected));
 		});
 		
 		
@@ -243,8 +243,8 @@ describe('Text-metrics plugin', () => {
 			`;
 			
 			const processed = processCSS(css);
-			
-			expect(processed).toBe(expected);
+
+			expect(minify(processed)).toBe(minify(expected));
 		});
 		
 		
@@ -271,8 +271,8 @@ describe('Text-metrics plugin', () => {
 			`;
 			
 			const processed = processCSS(css);
-			
-			expect(processed).toBe(expected);
+
+			expect(minify(processed)).toBe(minify(expected));
 		});
 		
 		
@@ -301,8 +301,8 @@ describe('Text-metrics plugin', () => {
 			`;
 			
 			const processed = processCSS(css);
-			
-			expect(processed).toBe(expected);
+
+			expect(minify(processed)).toBe(minify(expected));
 		});
 		
 		
@@ -329,8 +329,8 @@ describe('Text-metrics plugin', () => {
 			`;
 			
 			const processed = processCSS(css);
-			
-			expect(processed).toBe(expected);
+
+			expect(minify(processed)).toBe(minify(expected));
 		});
 		
 		
@@ -357,8 +357,8 @@ describe('Text-metrics plugin', () => {
 			`;
 			
 			const processed = processCSS(css);
-			
-			expect(processed).toBe(expected);
+
+			expect(minify(processed)).toBe(minify(expected));
 		});
 		
 		/**
@@ -386,8 +386,8 @@ describe('Text-metrics plugin', () => {
 			`;
 			
 			const processed = processCSS(css);
-			
-			expect(processed).toBe(expected);
+
+			expect(minify(processed)).toBe(minify(expected));
 		});
 		
 		/**
@@ -415,7 +415,7 @@ describe('Text-metrics plugin', () => {
 				}
 			`;
 			const processed = processCSS(css);
-			expect(processed).toBe(expected);
+			expect(minify(processed)).toBe(minify(expected));
 		});
 		
 	});
@@ -449,7 +449,7 @@ describe('Text-metrics plugin', () => {
 				}
 			`;
 			const processed = processCSS(css);
-			expect(processed).toBe(expected);
+			expect(minify(processed)).toBe(minify(expected));
 		});
 		
 		
@@ -471,7 +471,7 @@ describe('Text-metrics plugin', () => {
 				}
 			`;
 			const processed = processCSS(css);
-			expect(processed).toBe(expected);
+			expect(minify(processed)).toBe(minify(expected));
 		});
 		
 		
@@ -493,7 +493,7 @@ describe('Text-metrics plugin', () => {
 				}
 			`;
 			const processed = processCSS(css);
-			expect(processed).toBe(expected);
+			expect(minify(processed)).toBe(minify(expected));
 		});
 		
 		
@@ -515,7 +515,7 @@ describe('Text-metrics plugin', () => {
 				}
 			`;
 			const processed = processCSS(css);
-			expect(processed).toBe(expected);
+			expect(minify(processed)).toBe(minify(expected));
 		});
 		
 		
@@ -536,7 +536,7 @@ describe('Text-metrics plugin', () => {
 					}
 				`;
 			const processed = processCSS(css);
-			expect(processed).toBe(expected);
+			expect(minify(processed)).toBe(minify(expected));
 		});
 		
 		
@@ -559,7 +559,7 @@ describe('Text-metrics plugin', () => {
 					}
 				`;
 			const processed = processCSS(css);
-			expect(processed).toBe(expected);
+			expect(minify(processed)).toBe(minify(expected));
 		});
 		
 		
@@ -582,7 +582,7 @@ describe('Text-metrics plugin', () => {
 					}
 				`;
 			const processed = processCSS(css);
-			expect(processed).toBe(expected);
+			expect(minify(processed)).toBe(minify(expected));
 		});
 		
 		
@@ -605,7 +605,7 @@ describe('Text-metrics plugin', () => {
 					}
 				`;
 			const processed = processCSS(css);
-			expect(processed).toBe(expected);
+			expect(minify(processed)).toBe(minify(expected));
 		});
 		
 		
@@ -630,7 +630,7 @@ describe('Text-metrics plugin', () => {
 					}
 				`;
 			const processed = processCSS(css);
-			expect(processed).toBe(expected);
+			expect(minify(processed)).toBe(minify(expected));
 		});
 		
 		
@@ -657,7 +657,7 @@ describe('Text-metrics plugin', () => {
 					}
 				`;
 			const processed = processCSS(css);
-			expect(processed).toBe(expected);
+			expect(minify(processed)).toBe(minify(expected));
 		});
 		
 	});
@@ -683,7 +683,7 @@ describe('Text-metrics plugin', () => {
 				}
 			`;
 			const processed = processCSS(css);
-			expect(processed).toBe(expected);
+			expect(minify(processed)).toBe(minify(expected));
 		});
 		
 		
