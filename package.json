@@ -1,7 +1,7 @@
 {
-  "name": "postcss-text-metrics",
+  "name": "postcss-text-indentation-adjustment",
   "version": "1.0.0",
-  "description": "Adjust padding/margin/translate/etc values on text metrics gaps",
+  "description": "PostCSS plugin for adjusting measurements or position values like padding, margin, translateY, top, bottom, etc. based on typography class names and relevant text metrics.",
   "main": "index.js",
   "scripts": {
     "build": "webpack",
