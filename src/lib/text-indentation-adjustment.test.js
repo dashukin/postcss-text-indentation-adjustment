@@ -1,5 +1,5 @@
 /*
-* postcss-text-metrics plugin tests
+* postcss-text-indentation-adjustment plugin tests
 * */
 
 /*global
@@ -13,10 +13,10 @@
  */
 
 import postcss from 'postcss';
-import postcsssTextMetrics from './text-metrics';
+import postcsssTextIndentation from './text-indentation-adjustment';
 import {minify} from 'sqwish';
 
-const textMetricsPlugin = postcsssTextMetrics({
+const textIndentationPlugin = postcsssTextIndentation({
 	dotReplacement: '%dot%',
 	corrections: {
 		'selector': [{
@@ -120,10 +120,10 @@ const textMetricsPlugin = postcsssTextMetrics({
 });
 
 const processCSS = function (css) {
-	return postcss().use(textMetricsPlugin).process(css).toString();
+	return postcss().use(textIndentationPlugin).process(css).toString();
 };
 
-describe('Text-metrics plugin', () => {
+describe('postcss-text-indentation-adjustment plugin', () => {
 	
 	/**
 	 * Test cases:

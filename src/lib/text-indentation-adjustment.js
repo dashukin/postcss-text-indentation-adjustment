@@ -1,5 +1,5 @@
 /**
- * Postcss text metrics plugin.
+ * postcss-text-indentation-adjustment plugin.
  * 
  */
 
@@ -50,12 +50,11 @@ import {
  * @param [options.corrections] {Object} Correction data for appropriate font-family
  * @param [optiosn.textMetrics.decreaseBy] {Function|Number|String} A value desired result should be decreased by.
  */
-export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
+export default postCSS.plugin('postcss-text-indentation-adjustment', (options = {}) => {
 	
 	const {
 		dotReplacement = '%dot%',
 		corrections = {},
-		plainCSS = true,
 		calculate = true, 	// if corrected values should be calculated. In case final value is NaN - all expression should be wrapped in calc()
 		useCalc = false
 	} = options;
@@ -710,7 +709,7 @@ export default postCSS.plugin('postcss-text-metrics', (options = {}) => {
 	}
 	
 	function _logDebug (...args) {
-		console.log.apply(console, ['postcss-text-metrics: '].concat(args));
+		console.log.apply(console, ['postcss-text-indentation-adjustment: '].concat(args));
 	}
 	
 });

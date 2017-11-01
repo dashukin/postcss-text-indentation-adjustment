@@ -23,8 +23,7 @@ import postcssScss from 'postcss-scss';
 import sass from 'gulp-sass';
 import nodeSass from 'node-sass';
 import fse from 'fs-extra';
-import textMetrics from './src/index';
-import parser from './src/lib/parser';
+import textIndentationAdjustment, {parser} from './index';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import fontMetrics from 'font-metrics';
 import runSequence from 'run-sequence';
@@ -56,7 +55,7 @@ const scssData = nodeSass.renderSync({
 	file: source.scssTypography
 }).css.toString();
 const parsedScssData = parseTypography(scssData);
-const scssTextMetricsPlugin = textMetrics({
+const scssTextMetricsPlugin = textIndentationAdjustment({
 	corrections: parsedScssData,
 	plainCSS: false
 });
@@ -142,7 +141,7 @@ gulp.task('fonts:parse', () => {
 gulp.task('compile:css-gulp', () => {
 	const cssData = fse.readFileSync(source.cssTypography, 'utf8');
 	const parsedCSSData = parseTypography(cssData);
-	const cssTextMetricsPlugin = textMetrics({
+	const cssTextMetricsPlugin = textIndentationAdjustment({
 		corrections: parsedCSSData
 	});
 
@@ -161,7 +160,7 @@ gulp.task('compile:scss-gulp', () => {
 		file: source.scssTypography
 	}).css.toString();
 	const parsedScssData = parseTypography(scssData);
-	const scssTextMetricsPlugin = textMetrics({
+	const scssTextMetricsPlugin = textIndentationAdjustment({
 		corrections: parsedScssData,
 		plainCSS: false
 	});
@@ -189,7 +188,7 @@ gulp.task('compile:scss-webpack', () => {
 		file: source.scssTypography
 	}).css.toString();
 	const parsedScssData = parseTypography(scssData);
-	const scssTextMetricsPlugin = textMetrics({
+	const scssTextMetricsPlugin = textIndentationAdjustment({
 		corrections: parsedScssData,
 		plainCSS: false
 	});

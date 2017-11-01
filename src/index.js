@@ -2,12 +2,12 @@
 * postcss-text-metrics index file
 * */
 
-import textMetrics from './lib/text-metrics';
+import textIndentationAdjustment from './lib/text-indentation-adjustment';
 import parser from './lib/parser';
 
 export {
 	parser,
-	textMetrics
+	textIndentationAdjustment
 }
 
-export default textMetrics;
+export default textIndentationAdjustment;
