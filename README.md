@@ -2,9 +2,10 @@
 PostCSS plugin for adjusting measurements or position values like padding, margin, translateY, top, bottom, etc. based on typography class names and relevant text metrics.
 
 #### The main goals of this plugin are:
-1. Provide safe ability to describe indentation corrections and avoid any dependency on custom style syntax.
-1. Support automatic creation of any dependend rules based on media queries, localizations or any specific parent selectors defined for common typography styles.
-1. Support CSS, SCSS or whatever syntax postcss can handle via appropriate parser. 
+1. Provide safe ability to describe indentation corrections based on core typography styles.
+1. Avoid any dependency on custom style syntax.
+1. Support **automatic creation of any dependend rules based on media queries, localizations or any specific parent selectors defined for common typography styles**.
+1. Support **CSS, SCSS** or whatever syntax postcss can handle via appropriate parser. 
 
 ## Example
 
@@ -58,6 +59,7 @@ html[lang="ko"] .p1 {
 
 ### CSS Input.
 Example styles that should receive corrections **based on core styles**.
+Core concept is to have common rules for all typography styles in one place - this makes much easier any transitions to new styles once design is going to be changed.
 ```css
 .rule {
 	padding-top: 24px /* {24px, .p1} */;
