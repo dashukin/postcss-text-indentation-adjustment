@@ -247,5 +247,35 @@ html[lang="en"] .parent-rule .rule-inside-media,html[lang="ko"] .parent-rule .ru
 
 ```
 
+### Usage example
+#### 1. Import modules
+
+```javascript
+import fse from 'fs-extra';
+import path from 'path';
+import textIndentationAdjustment, {parser} from 'postcss-text-indentation-adjustment';
+import postcss from 'postcss';
+```
+
+#### 2. Parse core typography styles
+
+```javascript
+const typographyStyles = fse.readFileSync(path.resolve(__dirname, './path/to/core/typography.css'), 'utf8');
+const parseTypography = parser({ /*options*/ });
+const parsedTypography = parseTypography(typographyStyles);
+```
+
+#### 3. Run postcss on target styles
+
+```javascript
+const textIndentationAdjustmentPlugin = textIndentationAdjustment();
+fse.readFile('path/to/source/style.css', (err, css) => {
+    postcss([textIndentationAdjustmentPlugin])
+        .process(css)
+        .then(result => {
+            fse.writeFile('path/to/dest/style.css', result.css);
+        });
+});
+```
 
 #### Work in progress...
