@@ -381,7 +381,7 @@ gulp.task('compile:css-gulp', () => {
 });
 ```
 
-#### Weback usage example
+#### Webpack usage example
 
 In case any preprocessor is used - postcss plugin should be used before it with appropriate syntax.
 
