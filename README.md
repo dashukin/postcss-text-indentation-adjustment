@@ -11,14 +11,14 @@ PostCSS plugin for adjusting measurements or position values like padding, margi
 ## Content
 
 - [Example](#Example)
-- [Core typography](#Core typography)
-- [CSS Input](#CSS Input)
-- [CSS Output (unoptimized)](#CSS Output (unoptimized))
-- [CSS Output (optimized)](#CSS Output (optimized))
-- [Usage example](#Usage example)
-- [Postcss usage example](#Postcss usage example)
-- [Gulp usage example](#Gulp usage example)
-- [Weback usage example](#Weback usage example)
+- [Core typography](#Core-typography)
+- [CSS Input](#CSS-Input)
+- [CSS Output (unoptimized)](#CSS-Output-unoptimized)
+- [CSS Output (optimized)](#CSS-Output-optimized)
+- [Usage example](#Usage-example)
+- [Postcss usage example](#Postcss-usage-example)
+- [Gulp usage example](#Gulp-usage-example)
+- [Weback usage example](#Weback-usage-example)
 
 
 ## Example
