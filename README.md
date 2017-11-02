@@ -2,11 +2,24 @@
 PostCSS plugin for adjusting measurements or position values like padding, margin, translateY, top, bottom, etc. based on typography class names and relevant text metrics.
 
 #### The main goals of this plugin are:
-1. Provide ability to create pixel-perfect calculations for i.e. paddings/margins/etc. based on font metrics (diacritics/text rendering box gaps) and typography rules (line-height/font-size).
+1. Provide ability to create pixel-perfect calculations for i.e. paddings/margins/etc. based on font metrics (diacritics, text rendering box gaps) and typography rules (line-height, font-size).
 1. Provide safe ability to describe indentation corrections based on core typography styles.
-1. Avoid any dependency on custom style syntax.
+1. Avoid any dependency on custom style syntax that cannot be simply ignored if needed.
 1. Support **automatic creation of any dependend rules based on media queries, localizations or any specific parent selectors defined for common typography styles**.
 1. Support **CSS, SCSS** or whatever syntax postcss can handle via appropriate parser. 
+
+## Content
+
+- [Example](#Example)
+- [Core typography](#Core typography)
+- [CSS Input](#CSS Input)
+- [CSS Output (unoptimized)](#CSS Output (unoptimized))
+- [CSS Output (optimized)](#CSS Output (optimized))
+- [Usage example](#Usage example)
+- [Postcss usage example](#Postcss usage example)
+- [Gulp usage example](#Gulp usage example)
+- [Weback usage example](#Weback usage example)
+
 
 ## Example
 
