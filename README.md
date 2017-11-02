@@ -18,7 +18,7 @@ PostCSS plugin for adjusting measurements or position values like padding, margi
 - [Usage example](#usage-example)
 - [Postcss usage example](#postcss-usage-example)
 - [Gulp usage example](#gulp-usage-example)
-- [Weback usage example](#webpack-usage-example)
+- [Webpack usage example](#webpack-usage-example)
 
 
 ## Example
