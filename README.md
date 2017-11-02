@@ -18,7 +18,7 @@ PostCSS plugin for adjusting measurements or position values like padding, margi
 - [Usage example](#usage-example)
 - [Postcss usage example](#postcss-usage-example)
 - [Gulp usage example](#gulp-usage-example)
-- [Weback usage example](#weback-usage-example)
+- [Weback usage example](#webpack-usage-example)
 
 
 ## Example
@@ -291,15 +291,62 @@ import cssMqPacker from 'css-mqpacker';
 import mergeRules from 'postcss-merge-rules';
 ```
 
-#### 2. Parse core typography styles
+#### 2. Create text metrics data to be used for pixel-perfect correction.
+**Basic adjustment will only include line-height corrections.** 
+
+In order to achieve pixel-perfect result **plugin requires [text metrics](https://developer.mozilla.org/en-US/docs/Web/API/TextMetrics)** data (of each font that is used in core typography styles) to be passed to parser as an option. 
+Most of the time **text metrics** retrieving is a one time operation which can be perfomed by [font-metrics](https://github.com/dashukin/font-metrics) tool. It will provide a json file with all required data that should be used in order to provide more neat result.
+
+Text metrics can be created for system fonts as well as for localy or remotely hosted fonts.
+
+##### See the usage example:
+```javascript
+import fontMetrics from 'font-metrics';
+
+const fontParser = fontMetrics({
+	fonts: [
+		{
+			fontFamily: 'Arial'
+		},
+		{
+			fontFamily: 'Roboto',
+			src: 'https://fonts.gstatic.com/s/roboto/v15/sTdaA6j0Psb920Vjv-mrzH-_kf6ByYO6CLYdB4HQE-Y.woff2'
+		},
+		{
+			fontFamily: 'SteelworksVintageDemo',
+			src: 'mounted-path/SteelworksVintageDemo.otf'
+		}
+	],
+	output: './metrics/',
+	filename: 'metrics.json',
+	express: {
+		port: 3412,
+		mount: [
+			{
+				alias: 'mounted-path',
+				path: __dirname + '/your/local/dir/with/fonts'
+			}
+		]
+	}
+});
+
+fontParser.parse();
+```
+
+#### 3. Parse core typography styles
 
 Core typography parser takes into input **.css** file. 
 
 In case core typography styles are written with any preprocessor like sass, scss, less - they should be precompiled once before text-indentation-plugin initialization.
 
 ```javascript
+// load text metrics data
+const textMetricsData = JSON.parse(fse.readFileSync('path/to/parsed/text-metrics.json', 'utf-8'));
+
 const typographyStyles = fse.readFileSync(path.resolve(__dirname, './path/to/core/typography.css'), 'utf8');
-const parseTypography = parser({ /*options*/ });
+const parseTypography = parser({
+	metrics: textMetricsData.metrics
+});
 const parsedTypography = parseTypography(typographyStyles);
 
 const textIndentationAdjustmentPlugin = textIndentationAdjustment({
@@ -307,25 +354,20 @@ const textIndentationAdjustmentPlugin = textIndentationAdjustment({
 });
 ```
 
-#### 3. Run postcss on target styles
+#### 4. Run postcss on target styles depending on the build setup
 
-#### 3.1 Postcss usage example
+#### Postcss usage example
 
 ```javascript
-const textIndentationAdjustmentPlugin = textIndentationAdjustment({
-	corrections: parsedTypography
-});
-
 fse.readFile('path/to/source/style.css', (err, css) => {
-    postcss([textIndentationAdjustmentPlugin])
+    postcss([textIndentationAdjustmentPlugin, mergeRules(), cssMqPacker()])
         .process(css)
         .then(result => {
             fse.writeFile('path/to/dest/style.css', result.css);
         });
 });
 ```
-
-#### 3.2 Gulp usage example
+#### Gulp usage example
 
 ```javascript
 gulp.task('compile:css-gulp', () => {
@@ -339,13 +381,19 @@ gulp.task('compile:css-gulp', () => {
 });
 ```
 
-#### 3.3 Weback usage example
+#### Weback usage example
 
 In case any preprocessor is used - postcss plugin should be used before it with appropriate syntax.
 
 In example, **scss** files should have their partials inlined before running this plugin, and appropriate postcss syntax (_postcss-scss_) should be used.
 
 ```javascript
+// index.js
+import 'path/to/styles/to/be/imported.scss';
+```
+
+```javascript
+// webpack config
 const webpackConfig = {
 	entry: {
 		index: path.resolve(__dirname, 'path/to/src/index.js')
@@ -390,5 +438,7 @@ const webpackConfig = {
 	]
 }
 ```
+
+### 
 
 #### Work in progress...
