@@ -40,6 +40,7 @@
   "devDependencies": {
     "babel": "^6.23.0",
     "babel-core": "^6.24.0",
+    "babel-jest": "^21.2.0",
     "babel-loader": "^7.1.2",
     "babel-preset-latest": "^6.24.0",
     "css-loader": "^0.28.7",
@@ -54,7 +55,7 @@
     "gulp-postcss": "^7.0.0",
     "gulp-sass": "^3.1.0",
     "gulp-webpack": "^1.5.0",
-    "jest": "^19.0.2",
+    "jest": "^21.2.1",
     "node-sass": "^4.5.2",
     "postcss-cli": "^3.1.1",
     "postcss-loader": "^2.0.8",
@@ -68,5 +69,17 @@
     "sqwish": "^0.2.2",
     "style-loader": "^0.19.0",
     "webpack": "^3.6.0"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.js$": "babel-jest"
+    },
+    "moduleFileExtensions": [
+      "js"
+    ],
+    "moduleDirectories": [
+      "node_modules",
+      "bower_components"
+    ]
   }
 }
