@@ -33,11 +33,11 @@ import postCSS from 'postcss';
 import _ from 'lodash';
 
 import {
-	extractDeclarations, 
-	extractProperty, 
-	extractValue, 
-	extractGroups, 
-	hasGroup, 
+	extractDeclarations,
+	extractProperty,
+	extractValue,
+	extractGroups,
+	hasGroup,
 	exctractAtRuleReplacement,
 	getCorrectionGroupArguments
 } from './helpers';
@@ -55,7 +55,7 @@ export default postCSS.plugin('postcss-text-indentation-adjustment', (options = 
 	const {
 		dotReplacement = '%dot%',
 		corrections = {},
-		calculate = true, 	// if corrected values should be calculated. In case final value is NaN - all expression should be wrapped in calc()
+		calculate = true,	// if corrected values should be calculated. In case final value is NaN - all expression should be wrapped in calc()
 		useCalc = false
 	} = options;
 
@@ -161,6 +161,10 @@ export default postCSS.plugin('postcss-text-indentation-adjustment', (options = 
 				// exctract value that is going to be processed
 				// e.g. {24px, .p2, .p1} 0 {24px, .p2, .p3}
 				const newDeclrationValue = extractValue(rawValue);
+
+				if (!newDeclrationValue) {
+					return;
+				}
 
 				// replace all correction groups with processed values
 				// e.g. 24px - 5 - 7 0 24px - 5 - 0

@@ -15,7 +15,8 @@ import {
  * @returns {Array}
  */
 export const extractDeclarations = (input) => {
-	let {pattern, flags} = declarationPattern;
+	const {pattern, flags} = declarationPattern;
+
 	return trim(input).match(new RegExp(pattern, flags)) || [];
 }
 
@@ -25,8 +26,9 @@ export const extractDeclarations = (input) => {
  * @returns {String|Null}
  */
 export const extractProperty = input => {
-	let {pattern, flags} = propertyPattern;
-	let [, output = null] = trim(input).match(new RegExp(pattern, flags)) || [];
+	const {pattern, flags} = propertyPattern;
+	const [, output = null] = trim(input).match(new RegExp(pattern, flags)) || [];
+
 	return output;
 }
 
@@ -36,8 +38,9 @@ export const extractProperty = input => {
  * @returns {String|Null}
  */
 export const extractValue = input => {
-	let {pattern, flags} = valuePattern;
-	let [, output = null] = trim(input).match(new RegExp(pattern, flags)) || [];
+	const {pattern, flags} = valuePattern;
+	const [, output = null] = trim(input).match(new RegExp(pattern, flags)) || [];
+
 	return output ? trim(output) : output;
 }
 
@@ -47,7 +50,8 @@ export const extractValue = input => {
  * @returns {Array}
  */
 export const extractGroups = input => {
-	let {pattern, flags} = groupPattern;
+	const {pattern, flags} = groupPattern;
+
 	return (trim(input).match(new RegExp(pattern, flags)) || []).map(group => {
 		return trim(group.replace(/[{}]/g, ''));
 	});
@@ -59,8 +63,9 @@ export const extractGroups = input => {
  * @returns {Boolean}
  */
 export const hasGroup = input => {
-	let {pattern, flags} = groupPattern;
-	let output = (new RegExp(pattern, flags)).test(input);
+	const {pattern, flags} = groupPattern;
+	const output = (new RegExp(pattern, flags)).test(input);
+
 	return output;
 }
 
@@ -70,8 +75,9 @@ export const hasGroup = input => {
  * @returns {String|Null}
  */
 export const exctractAtRuleReplacement = input => {
-	let {pattern, flags} = atRuleReplacementPattern;
-	let [output = null] = trim(input).match(new RegExp(pattern, flags)) || [];
+	const {pattern, flags} = atRuleReplacementPattern;
+	const [output = null] = trim(input).match(new RegExp(pattern, flags)) || [];
+
 	return output;
 }
 
@@ -81,16 +87,19 @@ export const exctractAtRuleReplacement = input => {
  * @returns {Array} Correction group arguments
  */
 export const getCorrectionGroupArguments = input => {
-	let {pattern, flags} = groupArgumentsSplitPattern;
+	const {pattern, flags} = groupArgumentsSplitPattern;
+
 	return input.split(new RegExp(pattern, flags));
 }
 
 function trim (input = '') {
+	input = input || '';
+
 	return input.replace(/^\s+/, '').replace(/\s+$/, '');
 }
 
 export const makeStringOneLine = (str = '') => {
-	let result = trim(str.replace(/\n/gm, '').replace(/\s+/g, ' '));
+	const result = trim(str.replace(/\n/gm, '').replace(/\s+/g, ' '));
 
 	return result;
 };
