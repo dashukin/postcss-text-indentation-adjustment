@@ -347,7 +347,8 @@ const textMetricsData = JSON.parse(fse.readFileSync('path/to/parsed/text-metrics
 
 const typographyStyles = fse.readFileSync(path.resolve(__dirname, './path/to/core/typography.css'), 'utf8');
 const parseTypography = parser({
-	metrics: textMetricsData.metrics
+	metrics: textMetricsData.metrics,
+	plainCSS: true, // if final value should be calculated. For any preprocessors used - set it to false
 });
 const parsedTypography = parseTypography(typographyStyles);
 
