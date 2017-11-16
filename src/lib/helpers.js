@@ -6,7 +6,9 @@ import {
 	valuePattern, 
 	groupPattern, 
 	atRuleReplacementPattern, 
-	groupArgumentsSplitPattern
+	groupArgumentsSplitPattern,
+	debugPattern,
+	hasDebugPattern
 } from './patterns';
 
 /**
@@ -32,16 +34,41 @@ export const extractProperty = input => {
 	return output;
 }
 
+export const hasDebugOption = input => {
+	const {pattern, flags} = hasDebugPattern;
+	const hasDebug = (new RegExp(pattern, flags)).test(input);
+
+	return hasDebug;
+};
+
+export const extractDebugOption = (input = '') => {
+	const {pattern, flags} = debugPattern;
+	const debug = hasDebugOption(input);
+	let debugFreeInput = input;
+
+	if (debug) {
+		debugFreeInput = trim(debugFreeInput.replace(new RegExp(pattern, flags), ''));
+		debugFreeInput = debugFreeInput.replace(/\s+/g, ' ');
+	}
+
+	return [debugFreeInput, !!debug];
+};
+
 /**
  * Exctract declaration value
  * @param input {String}
- * @returns {String|Null}
+ * @returns {Object}
  */
 export const extractValue = input => {
+	const [flagsCleanInput, debug] = extractDebugOption(input);
 	const {pattern, flags} = valuePattern;
-	const [, output = null] = trim(input).match(new RegExp(pattern, flags)) || [];
+	const [, value] = trim(flagsCleanInput).match(new RegExp(pattern, flags)) || [];
 
-	return output ? trim(output) : output;
+	const result = {
+		value: value ? trim(value) : value,
+		debug
+	}
+	return result;
 }
 
 /**

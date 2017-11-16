@@ -36,3 +36,13 @@ export const groupArgumentsSplitPattern = {
 	pattern: '\\s*,\\s*',
 	flags: 'g'
 };
+
+export const debugPattern = {
+	pattern: '\\-\\-debug',
+	flags: 'g'
+}
+
+export const hasDebugPattern = {
+	pattern: `\\s+${debugPattern.pattern}(?:\\s|\\*|$)`,
+	flags: 'g'
+}

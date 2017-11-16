@@ -120,7 +120,9 @@ const textIndentationPlugin = postcsssTextIndentation({
 });
 
 const processCSS = function (css) {
-	return postcss().use(textIndentationPlugin).process(css).toString();
+	return postcss().use(textIndentationPlugin).process(css).then((result => {
+		return result.toString();
+	}));
 };
 
 describe('postcss-text-indentation-adjustment plugin', () => {
@@ -164,9 +166,9 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 				}
 			`;
 			
-			const processed = processCSS(css);
-
-			expect(minify(processed)).toBe(minify(expected));
+			processCSS(css).then(processed => {
+				expect(minify(processed)).toBe(minify(expected));
+			});
 		});
 		
 		
@@ -189,10 +191,10 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 					font-family: Arial;
 				}
 			`;
-			
-			const processed = processCSS(css);
 
-			expect(minify(processed)).toBe(minify(expected));
+			processCSS(css).then(processed => {
+				expect(minify(processed)).toBe(minify(expected));
+			});
 		});
 		
 		
@@ -215,10 +217,10 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 					font-family: Arial;
 				}
 			`;
-			
-			const processed = processCSS(css);
 
-			expect(minify(processed)).toBe(minify(expected));
+			processCSS(css).then(processed => {
+				expect(minify(processed)).toBe(minify(expected));
+			});
 		});
 		
 		
@@ -241,10 +243,10 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 					font-family: Arial;
 				}
 			`;
-			
-			const processed = processCSS(css);
 
-			expect(minify(processed)).toBe(minify(expected));
+			processCSS(css).then(processed => {
+				expect(minify(processed)).toBe(minify(expected));
+			});
 		});
 		
 		
@@ -269,10 +271,10 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 					font-family: Arial;
 				}
 			`;
-			
-			const processed = processCSS(css);
 
-			expect(minify(processed)).toBe(minify(expected));
+			processCSS(css).then(processed => {
+				expect(minify(processed)).toBe(minify(expected));
+			});
 		});
 		
 		
@@ -299,10 +301,10 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 					font-family: Arial;
 				}
 			`;
-			
-			const processed = processCSS(css);
 
-			expect(minify(processed)).toBe(minify(expected));
+			processCSS(css).then(processed => {
+				expect(minify(processed)).toBe(minify(expected));
+			});
 		});
 		
 		
@@ -327,10 +329,10 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 					}
 				}
 			`;
-			
-			const processed = processCSS(css);
 
-			expect(minify(processed)).toBe(minify(expected));
+			processCSS(css).then(processed => {
+				expect(minify(processed)).toBe(minify(expected));
+			});
 		});
 		
 		
@@ -355,10 +357,10 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 					}
 				}
 			`;
-			
-			const processed = processCSS(css);
 
-			expect(minify(processed)).toBe(minify(expected));
+			processCSS(css).then(processed => {
+				expect(minify(processed)).toBe(minify(expected));
+			});
 		});
 		
 		/**
@@ -384,10 +386,10 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 					}
 				}
 			`;
-			
-			const processed = processCSS(css);
 
-			expect(minify(processed)).toBe(minify(expected));
+			processCSS(css).then(processed => {
+				expect(minify(processed)).toBe(minify(expected));
+			});
 		});
 		
 		/**
@@ -414,8 +416,10 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 					}
 				}
 			`;
-			const processed = processCSS(css);
-			expect(minify(processed)).toBe(minify(expected));
+
+			processCSS(css).then(processed => {
+				expect(minify(processed)).toBe(minify(expected));
+			});
 		});
 		
 	});
@@ -448,8 +452,10 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 					margin-top: 20px;
 				}
 			`;
-			const processed = processCSS(css);
-			expect(minify(processed)).toBe(minify(expected));
+
+			processCSS(css).then(processed => {
+				expect(minify(processed)).toBe(minify(expected));
+			});
 		});
 		
 		
@@ -470,8 +476,10 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 					padding-bottom: 20px;
 				}
 			`;
-			const processed = processCSS(css);
-			expect(minify(processed)).toBe(minify(expected));
+
+			processCSS(css).then(processed => {
+				expect(minify(processed)).toBe(minify(expected));
+			});
 		});
 		
 		
@@ -492,8 +500,10 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 					padding-bottom: 20px;
 				}
 			`;
-			const processed = processCSS(css);
-			expect(minify(processed)).toBe(minify(expected));
+
+			processCSS(css).then(processed => {
+				expect(minify(processed)).toBe(minify(expected));
+			});
 		});
 		
 		
@@ -514,8 +524,10 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 					padding-bottom: 20px;
 				}
 			`;
-			const processed = processCSS(css);
-			expect(minify(processed)).toBe(minify(expected));
+
+			processCSS(css).then(processed => {
+				expect(minify(processed)).toBe(minify(expected));
+			});
 		});
 		
 		
@@ -535,8 +547,10 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 						margin-top: 20px;
 					}
 				`;
-			const processed = processCSS(css);
-			expect(minify(processed)).toBe(minify(expected));
+
+			processCSS(css).then(processed => {
+				expect(minify(processed)).toBe(minify(expected));
+			});
 		});
 		
 		
@@ -558,8 +572,10 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 						padding-bottom: 20px;
 					}
 				`;
-			const processed = processCSS(css);
-			expect(minify(processed)).toBe(minify(expected));
+
+			processCSS(css).then(processed => {
+				expect(minify(processed)).toBe(minify(expected));
+			});
 		});
 		
 		
@@ -581,8 +597,10 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 						}
 					}
 				`;
-			const processed = processCSS(css);
-			expect(minify(processed)).toBe(minify(expected));
+
+			processCSS(css).then(processed => {
+				expect(minify(processed)).toBe(minify(expected));
+			});
 		});
 		
 		
@@ -604,8 +622,10 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 						}
 					}
 				`;
-			const processed = processCSS(css);
-			expect(minify(processed)).toBe(minify(expected));
+
+			processCSS(css).then(processed => {
+				expect(minify(processed)).toBe(minify(expected));
+			});
 		});
 		
 		
@@ -629,8 +649,10 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 						}
 					}
 				`;
-			const processed = processCSS(css);
-			expect(minify(processed)).toBe(minify(expected));
+
+			processCSS(css).then(processed => {
+				expect(minify(processed)).toBe(minify(expected));
+			});
 		});
 		
 		
@@ -656,8 +678,10 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 						}
 					}
 				`;
-			const processed = processCSS(css);
-			expect(minify(processed)).toBe(minify(expected));
+
+			processCSS(css).then(processed => {
+				expect(minify(processed)).toBe(minify(expected));
+			});
 		});
 		
 	});
@@ -682,8 +706,10 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 					padding-bottom: 20px;
 				}
 			`;
-			const processed = processCSS(css);
-			expect(minify(processed)).toBe(minify(expected));
+
+			processCSS(css).then(processed => {
+				expect(minify(processed)).toBe(minify(expected));
+			});
 		});
 		
 		
@@ -703,8 +729,10 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 					}
 				}
 			`;
-			const processed = processCSS(css);
-			expect(minify(processed)).toBe(minify(expected));
+
+			processCSS(css).then(processed => {
+				expect(minify(processed)).toBe(minify(expected));
+			});
 		});
 		
 		
@@ -724,8 +752,10 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 					}
 				}
 			`;
-			const processed = processCSS(css);
-			expect(minify(processed)).toBe(minify(expected));
+
+			processCSS(css).then(processed => {
+				expect(minify(processed)).toBe(minify(expected));
+			});
 		});
 		
 		
@@ -750,8 +780,10 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 					}
 				}
 			`;
-			const processed = processCSS(css);
-			expect(minify(processed)).toBe(minify(expected));
+
+			processCSS(css).then(processed => {
+				expect(minify(processed)).toBe(minify(expected));
+			});
 		});
 		
 	});

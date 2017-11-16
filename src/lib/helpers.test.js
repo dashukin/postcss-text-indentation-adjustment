@@ -3,7 +3,7 @@
 * */
 
 /*global
-	test, expect
+	describe, xdescribe, test, expect
  */
 
 import {
@@ -13,7 +13,9 @@ import {
 	extractGroups,
 	hasGroup,
 	exctractAtRuleReplacement,
-	makeStringOneLine
+	makeStringOneLine,
+	hasDebugOption,
+	extractDebugOption
 } from './helpers';
 
 test('should return array of parsed declarations or empty array if no declarations were found', () => {
@@ -65,36 +67,129 @@ test('should return css declaration property from string',() => {
 		.toEqual('-webkit-padding-top')
 });
 
-test('should return css declaration value from string', () => {
-	expect(extractValue('padding: 2px'))
-		.toEqual('2px');
-	
-	expect(extractValue('padding-top: {$p2, l1, l2}'))
-		.toEqual('{$p2, l1, l2}');
-	
-	expect(extractValue('padding: 2px {$p2, l1, l2}'))
-		.toEqual('2px {$p2, l1, l2}');
-	
-	expect(extractValue('padding: 2px {$p2, l1, l2} 2px {$p2, l1, l2}'))
-		.toEqual('2px {$p2, l1, l2} 2px {$p2, l1, l2}');
-	
-	expect(extractValue('padding: {$p2, l1, l2} 2px {$p2, l1, l2} 2px'))
-		.toEqual('{$p2, l1, l2} 2px {$p2, l1, l2} 2px');
-	
-	expect(extractValue('padding:{$p2, l1, l2} 2px {$p2, l1, l2} 2px'))
-		.toEqual('{$p2, l1, l2} 2px {$p2, l1, l2} 2px');
-	
-	expect(extractValue('padding:3px 2px {$p2, l1, l2} 2px'))
-		.toEqual('3px 2px {$p2, l1, l2} 2px');
-	
-	expect(extractValue('padding:3px 2px 2px'))
-		.toEqual('3px 2px 2px');
-	
-	expect(extractValue('padding-bottom: $p2/*{$p2, .p1, .bcaps}*/'))
-		.toEqual('{$p2, .p1, .bcaps}');
-	
-	expect(extractValue('padding-bottom: $p2 /*{$p2, .p1, .bcaps} */'))
-		.toEqual('{$p2, .p1, .bcaps}');
+describe('.hasDebugOption', () => {
+	test('should return true when declaration value contains ---debug flag', () => {
+		expect(hasDebugOption('padding: 2px /*{2px} --debug */'))
+			.toBeTruthy();
+
+		expect(hasDebugOption('padding: 2px /*{2px} --debug*/'))
+			.toBeTruthy();
+	});
+
+	test('should return false when declaration value doesn\'t contains ---debug flag', () => {
+		expect(hasDebugOption('padding: 2px /*{2px}--debug */'))
+			.toBeFalsy();
+
+		expect(hasDebugOption('padding: 2px /*{2px}--debug*/'))
+			.toBeFalsy();
+
+		expect(hasDebugOption('padding: 2px /*{2px} --debugger */'))
+			.toBeFalsy();
+	});
+});
+
+describe('.extractDebugOption', () => {
+	test('should return array containing declaration value without --debug flag as a first argument ' +
+		'and false as a second argument', () => {
+		expect(extractDebugOption('padding: 2px /*{2px}*/'))
+			.toEqual(['padding: 2px /*{2px}*/', false]);
+
+		expect(extractDebugOption('padding: 2px /*{2px} --flag*/'))
+			.toEqual(['padding: 2px /*{2px} --flag*/', false]);
+
+		expect(extractDebugOption('padding: 2px /*{2px}--debug*/'))
+			.toEqual(['padding: 2px /*{2px}--debug*/', false]);
+
+		expect(extractDebugOption('padding: 2px /*{2px}--debugger*/'))
+			.toEqual(['padding: 2px /*{2px}--debugger*/', false]);
+
+		expect(extractDebugOption('padding: 2px /*{2px} --debugger*/'))
+			.toEqual(['padding: 2px /*{2px} --debugger*/', false]);
+
+		expect(extractDebugOption('padding: 2px /*{2px}--debugger */'))
+			.toEqual(['padding: 2px /*{2px}--debugger */', false]);
+
+		expect(extractDebugOption('padding: 2px /*{2px} --debugger */'))
+			.toEqual(['padding: 2px /*{2px} --debugger */', false]);
+	});
+
+	test('should return array containing declaration value without --debug flag as a first argument ' +
+		'and true as a second argument', () => {
+		expect(extractDebugOption('padding: 1px /*{1px} --debug */'))
+			.toEqual(['padding: 1px /*{1px} */', true]);
+
+		expect(extractDebugOption('padding: 2px /*{2px} --debug*/'))
+			.toEqual(['padding: 2px /*{2px} */', true]);
+
+		expect(extractDebugOption('padding: 3px /*{3px} --debug --flag*/'))
+			.toEqual(['padding: 3px /*{3px} --flag*/', true]);
+
+	});
+});
+
+describe('.extractValue', () => {
+	test('should return css declaration value under the .value property of object parsed from string', () => {
+		expect(extractValue('padding: 2px').value)
+			.toEqual('2px');
+
+		expect(extractValue('padding-top: {$p2, l1, l2}').value)
+			.toEqual('{$p2, l1, l2}');
+
+		expect(extractValue('padding: 2px {$p2, l1, l2}').value)
+			.toEqual('2px {$p2, l1, l2}');
+
+		expect(extractValue('padding: 2px {$p2, l1, l2} 2px {$p2, l1, l2}').value)
+			.toEqual('2px {$p2, l1, l2} 2px {$p2, l1, l2}');
+
+		expect(extractValue('padding: {$p2, l1, l2} 2px {$p2, l1, l2} 2px').value)
+			.toEqual('{$p2, l1, l2} 2px {$p2, l1, l2} 2px');
+
+		expect(extractValue('padding:{$p2, l1, l2} 2px {$p2, l1, l2} 2px').value)
+			.toEqual('{$p2, l1, l2} 2px {$p2, l1, l2} 2px');
+
+		expect(extractValue('padding:3px 2px {$p2, l1, l2} 2px').value)
+			.toEqual('3px 2px {$p2, l1, l2} 2px');
+
+		expect(extractValue('padding:3px 2px 2px').value)
+			.toEqual('3px 2px 2px');
+
+		expect(extractValue('padding-bottom: $p2/*{$p2, .p1, .bcaps}*/').value)
+			.toEqual('{$p2, .p1, .bcaps}');
+
+		expect(extractValue('padding-bottom: $p2 /*{$p2, .p1, .bcaps} */').value)
+			.toEqual('{$p2, .p1, .bcaps}');
+	});
+
+	test('should return debug value under the .debug property of object parsed from string', () => {
+		// truthy
+		expect(extractValue('padding: 2px --debug ').debug)
+			.toBeTruthy();
+
+		expect(extractValue('padding-top: {$p2, l1, l2} --debug').debug)
+			.toBeTruthy();
+
+		expect(extractValue('padding-bottom: $p2/*{$p2, .p1, .bcaps} --debug */').debug)
+			.toBeTruthy();
+
+		expect(extractValue('padding-bottom: $p2/*{$p2, .p1, .bcaps} --debug*/\'/').debug)
+			.toBeTruthy();
+
+		// falsy
+		expect(extractValue('padding: 2px--debug ').debug)
+			.toBeFalsy();
+
+		expect(extractValue('padding-top: {$p2, l1, l2}--debug').debug)
+			.toBeFalsy();
+
+		expect(extractValue('padding-bottom: $p2/*{$p2, .p1, .bcaps} --debugger */').debug)
+			.toBeFalsy();
+
+		expect(extractValue('padding-bottom: $p2/*{$p2, .p1, .bcaps}--debug*/\'/').debug)
+			.toBeFalsy();
+
+		expect(extractValue('padding-bottom: $p2/*{$p2, .p1, .bcaps}--debuger*/\'/').debug)
+			.toBeFalsy();
+	});
 });
 
 test('should return array of correction groups from string', () => {

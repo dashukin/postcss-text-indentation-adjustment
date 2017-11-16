@@ -30,6 +30,7 @@
 'use strict';
 
 import postCSS from 'postcss';
+import {Promise} from 'es6-promise';
 import _ from 'lodash';
 
 import {
@@ -55,7 +56,7 @@ export default postCSS.plugin('postcss-text-indentation-adjustment', (options = 
 	const {
 		dotReplacement = '%dot%',
 		corrections = {},
-		calculate = true,	// if corrected values should be calculated. In case final value is NaN - all expression should be wrapped in calc()
+		plainCSS = true,	// if corrected values should be calculated. In case final value is NaN - all expression should be wrapped in calc()
 		useCalc = false
 	} = options;
 
@@ -160,7 +161,7 @@ export default postCSS.plugin('postcss-text-indentation-adjustment', (options = 
 
 				// exctract value that is going to be processed
 				// e.g. {24px, .p2, .p1} 0 {24px, .p2, .p3}
-				const newDeclrationValue = extractValue(rawValue);
+				const {value: newDeclrationValue, debug} = extractValue(rawValue);
 
 				if (!newDeclrationValue) {
 					return;
@@ -170,22 +171,22 @@ export default postCSS.plugin('postcss-text-indentation-adjustment', (options = 
 				// e.g. 24px - 5 - 7 0 24px - 5 - 0
 
 				// create pure correction
-				const pureCorrectedDeclarationValue = getPureCorrectedDeclarationValue(newDeclrationValue);
+				const pureCorrectedDeclarationValue = getPureCorrectedDeclarationValue(newDeclrationValue, debug);
 				createDeclarations(declarationRule, declarationProperty, {
 					value: pureCorrectedDeclarationValue
-				});
+				}, debug);
 
 				// create selector based corrections
-				const selectorBasedDeclarations = getSelectorBasedCorrectedDeclarationValues(newDeclrationValue);
-				createDeclarations(declarationRule, declarationProperty, selectorBasedDeclarations);
+				const selectorBasedDeclarations = getSelectorBasedCorrectedDeclarationValues(newDeclrationValue, debug);
+				createDeclarations(declarationRule, declarationProperty, selectorBasedDeclarations, debug);
 
 				// create atRule based corrections
-				const atRuleBasedDeclarations = getAtRuleBasedCorrectedDeclarationValues(newDeclrationValue);
-				createDeclarations(declarationRule, declarationProperty, atRuleBasedDeclarations);
+				const atRuleBasedDeclarations = getAtRuleBasedCorrectedDeclarationValues(newDeclrationValue, debug);
+				createDeclarations(declarationRule, declarationProperty, atRuleBasedDeclarations, debug);
 
 				// create atRule + selector based corrections
-				const atRuleSelectorBasedDeclarations = getAtRuleSelectorBasedCorrectedDeclarationValues(newDeclrationValue);
-				createDeclarations(declarationRule, declarationProperty, atRuleSelectorBasedDeclarations);
+				const atRuleSelectorBasedDeclarations = getAtRuleSelectorBasedCorrectedDeclarationValues(newDeclrationValue, debug);
+				createDeclarations(declarationRule, declarationProperty, atRuleSelectorBasedDeclarations, debug);
 			}
 		}
 
@@ -206,9 +207,9 @@ export default postCSS.plugin('postcss-text-indentation-adjustment', (options = 
 
 				// get new value from atRule params
 				// e.g. {0, .p1, .l1} from @include yourMixinName(0/*{0, .p1, .l1}*/);
-				const newDeclrationValue = extractValue(atRuleRawValue) || '';
+				const {value: newDeclrationValue = '', debug} = extractValue(atRuleRawValue);
 				// create corrected value
-				const pureCorrectedDeclarationValue = getPureCorrectedDeclarationValue(newDeclrationValue);
+				const pureCorrectedDeclarationValue = getPureCorrectedDeclarationValue(newDeclrationValue, debug);
 
 				if (!pureCorrectedDeclarationValue) {
 					return;
@@ -246,7 +247,7 @@ export default postCSS.plugin('postcss-text-indentation-adjustment', (options = 
 			parsedDeclarations.forEach(parsedDeclaration => {
 				// parse declaration property name
 				const declarationProp = extractProperty(parsedDeclaration);
-				const declarationValue = extractValue(parsedDeclaration);
+				const {value: declarationValue, debug} = extractValue(parsedDeclaration);
 
 				if (!declarationProp || !declarationValue) {
 					return newDeclarations;
@@ -261,16 +262,29 @@ export default postCSS.plugin('postcss-text-indentation-adjustment', (options = 
 		/**
 		 * Create pure corrected declaration value parsed from input string.
 		 * @param declarationValue {String} Initial declaration value that shoud be corrected.
+		 * @param debug
 		 * @returns {*|null} Corrected value or null
 		 */
-		function getPureCorrectedDeclarationValue (declarationValue) {
-			let correctedDeclarationvalue = declarationValue;
+		function getPureCorrectedDeclarationValue (declarationValue, debug) {
+			let correctedDeclarationValue = declarationValue;
 			const correctionGroups = extractGroups(declarationValue);
+
+			if (debug) {
+				_logDebug('getPureCorrectedDeclarationValue:',);
+				_logDebug('correctedDeclarationValue:', correctedDeclarationValue);
+				_logDebug('correctionGroups:', correctionGroups);
+			}
 
 			correctionGroups.forEach(initialGroup => {
 				const initialGroupArguments = getCorrectionGroupArguments(initialGroup);
 				const firstArgument = initialGroupArguments[0];
 				const correctionDataCollection = getCorrectedData.apply(null, initialGroupArguments);
+
+				if (debug) {
+					_logDebug('initialGroupArguments:', initialGroupArguments);
+					_logDebug('firstArgument:', firstArgument);
+					_logDebug('correctionDataCollection:', correctionDataCollection);
+				}
 
 				// Process pure corrections without any "selector" or "atRule" modifications:
 				// pure corrections rely on data without correction selectors and atRules.
@@ -290,14 +304,20 @@ export default postCSS.plugin('postcss-text-indentation-adjustment', (options = 
 
 				const correctedValue = getCorrectedValue({
 					correctionValues,
-					calculate,
 					useCalc
-				});
+				}, debug);
 
-				correctedDeclarationvalue = correctedDeclarationvalue.replace(`{${initialGroup}}`, correctedValue);
+				correctedDeclarationValue = correctedDeclarationValue.replace(`{${initialGroup}}`, correctedValue);
+
+				if (debug) {
+					_logDebug('correctionValues:', correctionValues);
+					_logDebug('correctedValue:', correctedValue);
+					_logDebug('correctedDeclarationValue:', correctedDeclarationValue);
+				}
+
 			});
 
-			return correctionGroups.length ? correctedDeclarationvalue : null;
+			return correctionGroups.length ? correctedDeclarationValue : null;
 		}
 
 
@@ -356,7 +376,6 @@ export default postCSS.plugin('postcss-text-indentation-adjustment', (options = 
 
 					const correctedValue = getCorrectedValue({
 						correctionValues,
-						calculate,
 						useCalc
 					});
 
@@ -379,7 +398,7 @@ export default postCSS.plugin('postcss-text-indentation-adjustment', (options = 
 		 * @param declarationValue {String}
 		 * @returns {Object[]}
 		 */
-		function getAtRuleBasedCorrectedDeclarationValues (declarationValue) {
+		function getAtRuleBasedCorrectedDeclarationValues (declarationValue, debug) {
 			const initialDeclarationValue = declarationValue;
 
 			// first of all we should get all classNames data.
@@ -423,15 +442,14 @@ export default postCSS.plugin('postcss-text-indentation-adjustment', (options = 
 							return (data.atRule === atRule) || !data.atRule;
 						});
 						const correctedClassNameValueData = _.find(correctedClassNameValues, {atRule}) || _.find(correctedClassNameValues, {atRule: null}) || null;
-						const baseDelta 	= _.get(correctedClassNameValueData, 'baseDelta', 0);
-						const decreaseBy 	= _.get(correctedClassNameValueData, 'decreaseBy', 0);
+						const baseDelta		= _.get(correctedClassNameValueData, 'baseDelta', 0);
+						const decreaseBy	= _.get(correctedClassNameValueData, 'decreaseBy', 0);
 
 						return calculatedOutput.concat([baseDelta, decreaseBy]);
 					}, [firstArgument]);
 
 					const correctedValue = getCorrectedValue({
 						correctionValues,
-						calculate,
 						useCalc
 					});
 
@@ -454,7 +472,7 @@ export default postCSS.plugin('postcss-text-indentation-adjustment', (options = 
 		 * @param declarationValue {String}
 		 * @returns {Object[]}
 		 */
-		function getAtRuleSelectorBasedCorrectedDeclarationValues (declarationValue) {
+		function getAtRuleSelectorBasedCorrectedDeclarationValues (declarationValue, debug) {
 			const initialDeclarationValue = declarationValue;
 
 			// first of all we should get all classNames data.
@@ -506,7 +524,6 @@ export default postCSS.plugin('postcss-text-indentation-adjustment', (options = 
 
 					const correctedValue = getCorrectedValue({
 						correctionValues,
-						calculate,
 						useCalc
 					});
 
@@ -556,10 +573,9 @@ export default postCSS.plugin('postcss-text-indentation-adjustment', (options = 
 		 * In case calculate option is set to true - try to process given values and provide a result one.
 		 * Otherwise - use calc() function
 		 * @param correctionValues {Array} Corrections list
-		 * @param calculate {Boolean} If result should be calculated.
 		 * @param useCalc {Boolean} If expression value should be wrapped into css calc() function
 		 */
-		function getCorrectedValue ({correctionValues, calculate, useCalc}) {
+		function getCorrectedValue ({correctionValues, useCalc}, debug) {
 			const [initialValueString, ...subtrahends] = correctionValues;
 			const initialValue = parseInt(initialValueString.replace(/\D/g, ''), 10);
 			const initialUnit = initialValueString.replace(/\d/g, '');
@@ -571,11 +587,24 @@ export default postCSS.plugin('postcss-text-indentation-adjustment', (options = 
 
 			const expressionValue = [initialValueString].concat(subtrahends).join(' - ');
 
-			const outputValue = calculate && !isNaN(calculatedValue)
+			const outputValue = plainCSS && !isNaN(calculatedValue)
 				? calculatedValue + initialUnit
 				: useCalc || (isNaN(calculatedValue) && useCalc)
 					? `calc(${expressionValue})`
 					: expressionValue;
+
+
+			if (debug) {
+				_logDebug('getCorrectedValue:');
+				_logDebug('correctionValues:', correctionValues);
+				_logDebug('initialValueString:', initialValueString);
+				_logDebug('subtrahends:', subtrahends);
+				_logDebug('initialValue:', initialValue);
+				_logDebug('initialUnit:', initialUnit);
+				_logDebug('calculatedValue:', calculatedValue);
+				_logDebug('expressionValue:', expressionValue);
+				_logDebug('outputValue:', outputValue);
+			}
 
 			return outputValue;
 		}
@@ -588,7 +617,7 @@ export default postCSS.plugin('postcss-text-indentation-adjustment', (options = 
 		 * @param declarationValue.selector {String} Selector that should be applied at the beginning of newly created rule
 		 * @param declarationValue.value {Number|String} Declaration value
 		 */
-		function createDeclarations (rule, declarationProperty, declarationValue) {
+		function createDeclarations (rule, declarationProperty, declarationValue, debug) {
 			if (!rule || (!~['root', 'rule'].indexOf(rule.type))) {
 				_logDebug(`createDeclarations: invalid type of parentNode - ${rule.type}`);
 				return;
@@ -710,10 +739,10 @@ export default postCSS.plugin('postcss-text-indentation-adjustment', (options = 
 				}
 			});
 		}
+
+		function _logDebug (...args) {
+			console.log.apply(console, ['postcss-text-indentation-adjustment: '].concat(args));
+		}
 	}
-	
-	function _logDebug (...args) {
-		console.log.apply(console, ['postcss-text-indentation-adjustment: '].concat(args));
-	}
-	
+
 });
