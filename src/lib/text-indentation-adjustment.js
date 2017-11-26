@@ -94,6 +94,10 @@ export default postCSS.plugin('postcss-text-indentation-adjustment', (options = 
 					processComment(node);
 				} else if (type === 'decl') {
 					processDeclaration(node);
+				} else if (type === 'rule') {
+					processNode(node);
+				} else if (type === 'atrule') {
+					processAtRule(node);
 				}
 			});
 		}
@@ -618,7 +622,7 @@ export default postCSS.plugin('postcss-text-indentation-adjustment', (options = 
 		 * @param declarationValue.value {Number|String} Declaration value
 		 */
 		function createDeclarations (rule, declarationProperty, declarationValue, debug) {
-			if (!rule || (!~['root', 'rule'].indexOf(rule.type))) {
+			if (!rule || (!~['root', 'rule', 'atrule'].indexOf(rule.type))) {
 				_logDebug(`createDeclarations: invalid type of parentNode - ${rule.type}`);
 				return;
 			}
