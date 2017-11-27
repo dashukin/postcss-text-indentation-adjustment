@@ -15,7 +15,7 @@
  */
 
 import postcss from 'postcss';
-import postcsssTextIndentation from './text-indentation-adjustment';
+import postcsssTextIndentation from '../../index';
 import {minify} from 'sqwish';
 import postcssScss from 'postcss-scss';
 import nodeSass from 'node-sass';
