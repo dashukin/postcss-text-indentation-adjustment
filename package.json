@@ -1,6 +1,6 @@
 {
   "name": "postcss-text-indentation-adjustment",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "PostCSS plugin for adjusting measurements or position values like padding, margin, translateY, top, bottom, etc. based on typography class names and relevant text metrics.",
   "main": "index.js",
   "scripts": {
