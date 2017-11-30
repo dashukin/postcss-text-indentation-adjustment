@@ -633,8 +633,8 @@ export default postCSS.plugin('postcss-text-indentation-adjustment', (options = 
 			}
 
 			const {selector: ruleSelector, raws: ruleRaws} = rule;
-			const hasParentRule = rule.parent !== rule.root() && rule.parent.type === 'rule';
-			const ampersandValue = hasParentRule ? '&' : '';
+			const parentIsAtrule = rule.parent.type === 'atrule';
+			const ruleIsAtRule = rule.type === 'atrule';
 
 			// create array of declaration values even if only one object has been passed.
 			declarationValue = [].concat(declarationValue);
@@ -675,20 +675,24 @@ export default postCSS.plugin('postcss-text-indentation-adjustment', (options = 
 					});
 
 					// create new nested rule
-					const newRule = rule.clone();
+					const newRule = ruleIsAtRule ? new postCSS.rule() : rule.clone();
 					newRule.removeAll();
 
 					// update rules selector
-					newRule.selector = `${selector} ${ampersandValue} ${ruleSelector}`.replace(/\s{2,}/gi, ' ');
+					newRule.selector = selector + ' ' + (!plainCSS ? '&' : ruleSelector);
 					newRule.append(additionalRuleDeclaration);
 					newRule.raws.before = '\n\t';
 					newRule.raws.after = '\n';
 
 					// insert newly created rule into node.
-					if (hasParentRule) {
-						rule.parent.append(newRule);
+					if (!plainCSS) {
+						rule.append(newRule);
 					} else {
-						rule.root().append(newRule);
+						if (parentIsAtrule) {
+							rule.parent.append(newRule);
+						} else {
+							rule.root().append(newRule);
+						}
 					}
 				} else if (!selector && atRule) {
 					// atRule based correction
@@ -703,13 +707,21 @@ export default postCSS.plugin('postcss-text-indentation-adjustment', (options = 
 						value
 					});
 
-					const newRule = rule.clone();
+					const newRule = !plainCSS ? new postCSS.rule() : rule.clone();
 					newRule.removeAll();
-					newRule.selector = ruleSelector;
+
+					newRule.selector = !plainCSS ? '&' : ruleSelector;
+
 					newRule.raws.before = '\n\t';
 					newRule.raws.after = '\n\t';
 
-					rule.root().append(newAtRule);
+					// insert newly created rule into node.
+					if (!plainCSS) {
+						rule.append(newAtRule);
+					} else {
+						rule.root().append(newAtRule);
+					}
+
 					newAtRule.append(newRule);
 					newRule.append(declaration);
 
@@ -720,23 +732,31 @@ export default postCSS.plugin('postcss-text-indentation-adjustment', (options = 
 
 					newAtRule.name = atRuleName;
 					newAtRule.params = atRuleParams;
-					// newAtRule.raws.before = ruleRaws.before;
-					// newAtRule.raws.after = ruleRaws.after;
 
-					const newRule = rule.clone();
+					const newRule = !plainCSS ? new postCSS.rule() : rule.clone();
 					newRule.removeAll();
 
 					newRule.raws.before = '\n\t';
 					newRule.raws.after = '\n\t';
 
-					newRule.selector = `${selector} ${ampersandValue} ${ruleSelector}`.replace(/\s{2,}/gi, ' ');
+					newRule.selector = selector + ' ' + (!plainCSS ? '&' : ruleSelector);
 
 					const declaration = new postCSS.decl({
 						prop: declarationProperty,
 						value
 					});
 
-					rule.root().append(newAtRule);
+					// insert newly created rule into node.
+					if (!plainCSS) {
+						rule.append(newAtRule);
+					} else {
+						if (parentIsAtrule) {
+							rule.parent.append(newAtRule);
+						} else {
+							rule.root().append(newAtRule);
+						}
+					}
+
 					newAtRule.append(newRule);
 
 					newRule.append(declaration);

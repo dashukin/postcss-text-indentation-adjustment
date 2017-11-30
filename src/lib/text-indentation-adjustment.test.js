@@ -20,124 +20,133 @@ import {minify} from 'sqwish';
 import postcssScss from 'postcss-scss';
 import nodeSass from 'node-sass';
 
-const textIndentationPlugin = postcsssTextIndentation({
+const xminify = input => input;
+
+const corrections = {
+	'selector': [{
+		atRule: null,
+		selector: '',
+		baseDelta: 4,
+		decreaseBy: 0
+	}],
+	'selector-with-parent-selector': [{
+		atRule: null,
+		selector: '.only-parent-selector',
+		baseDelta: 4,
+		decreaseBy: 0
+	}],
+	'selector-with-parent-attr-selector': [{
+		atRule: null,
+		selector: 'html[lang=en]',
+		baseDelta: 4,
+		decreaseBy: 0
+	}],
+	'with-complex-parent-selector': [{
+		atRule: null,
+		selector: '.complex:first-child > .parent + selector',
+		baseDelta: 4,
+		decreaseBy: 0
+	}],
+	'rule-with-multiple-selectors': [{
+		atRule: null,
+		selector: '',
+		baseDelta: 4,
+		decreaseBy: 0
+	}],
+	'rule-with-multiple-selectors-and-parent-selector': [{
+		atRule: null,
+		selector: '',
+		baseDelta: 4,
+		decreaseBy: 0
+	}],
+	'simple-rule-within-atrule': [{
+		atRule: null,
+		selector: '',
+		baseDelta: 4,
+		decreaseBy: 0
+	}],
+	'simple-rule-within-atrule-with-parent-selector': [{
+		atRule: null,
+		selector: '',
+		baseDelta: 4,
+		decreaseBy: 0
+	}],
+	'simple-rule-within-atrule-with-multiple-selectors': [{
+		atRule: null,
+		selector: '',
+		baseDelta: 4,
+		decreaseBy: 0
+	}],
+	'simple-rule-within-atrule-with-multiple-parent-selectors': [{
+		atRule: null,
+		selector: '',
+		baseDelta: 4,
+		decreaseBy: 0
+	}],
+	'simple-rule-with-atrule-correction': [{
+		atRule: {
+			name: 'media',
+			params: '(min-width: 1499px)'
+		},
+		selector: '',
+		baseDelta: 4,
+		decreaseBy: 0
+	}],
+	'simple-rule-with-atrule-and-selector-correction': [{
+		atRule: {
+			name: 'media',
+			params: '(min-width: 1499px)'
+		},
+		selector: '.parent-selector',
+		baseDelta: 4,
+		decreaseBy: 0
+	}],
+	'combination': [{
+		atRule: null,
+		selector: '',
+		baseDelta: 4,
+		decreaseBy: 0
+	}, {
+		atRule: null,
+		selector: '.parent-selector',
+		baseDelta: 4,
+		decreaseBy: 0
+	}, {
+		atRule: {
+			name: 'media',
+			params: '(min-width: 1499px)'
+		},
+		selector: '.parent-selector',
+		baseDelta: 4,
+		decreaseBy: 0
+	}]
+};
+
+const textIndentationPluginCSS = postcsssTextIndentation({
 	dotReplacement: '%dot%',
-	corrections: {
-		'selector': [{
-			atRule: null,
-			selector: '',
-			baseDelta: 4,
-			decreaseBy: 0
-		}],
-		'selector-with-parent-selector': [{
-			atRule: null,
-			selector: '.only-parent-selector',
-			baseDelta: 4,
-			decreaseBy: 0
-		}],
-		'selector-with-parent-attr-selector': [{
-			atRule: null,
-			selector: 'html[lang=en]',
-			baseDelta: 4,
-			decreaseBy: 0
-		}],
-		'with-complex-parent-selector': [{
-			atRule: null,
-			selector: '.complex:first-child > .parent + selector',
-			baseDelta: 4,
-			decreaseBy: 0
-		}],
-		'rule-with-multiple-selectors': [{
-			atRule: null,
-			selector: '',
-			baseDelta: 4,
-			decreaseBy: 0
-		}],
-		'rule-with-multiple-selectors-and-parent-selector': [{
-			atRule: null,
-			selector: '',
-			baseDelta: 4,
-			decreaseBy: 0
-		}],
-		'simple-rule-within-atrule': [{
-			atRule: null,
-			selector: '',
-			baseDelta: 4,
-			decreaseBy: 0
-		}],
-		'simple-rule-within-atrule-with-parent-selector': [{
-			atRule: null,
-			selector: '',
-			baseDelta: 4,
-			decreaseBy: 0
-		}],
-		'simple-rule-within-atrule-with-multiple-selectors': [{
-			atRule: null,
-			selector: '',
-			baseDelta: 4,
-			decreaseBy: 0
-		}],
-		'simple-rule-within-atrule-with-multiple-parent-selectors': [{
-			atRule: null,
-			selector: '',
-			baseDelta: 4,
-			decreaseBy: 0
-		}],
-		'simple-rule-with-atrule-correction': [{
-			atRule: {
-				name: 'media',
-				params: '(min-width: 1499px)'
-			},
-			selector: '',
-			baseDelta: 4,
-			decreaseBy: 0
-		}],
-		'simple-rule-with-atrule-and-selector-correction': [{
-			atRule: {
-				name: 'media',
-				params: '(min-width: 1499px)'
-			},
-			selector: '.parent-selector',
-			baseDelta: 4,
-			decreaseBy: 0
-		}],
-		'combination': [{
-			atRule: null,
-			selector: '',
-			baseDelta: 4,
-			decreaseBy: 0
-		}, {
-			atRule: null,
-			selector: '.parent-selector',
-			baseDelta: 4,
-			decreaseBy: 0
-		}, {
-			atRule: {
-				name: 'media',
-				params: '(min-width: 1499px)'
-			},
-			selector: '.parent-selector',
-			baseDelta: 4,
-			decreaseBy: 0
-		}]
-	}
+	corrections: corrections
+});
+
+const textIndentationPluginSCSS = postcsssTextIndentation({
+	dotReplacement: '%dot%',
+	corrections: corrections,
+	plainCSS: false
 });
 
 const processCSS = function (css) {
-	return postcss().use(textIndentationPlugin).process(css).then(result => {
+	return postcss().use(textIndentationPluginCSS).process(css).then(result => {
 		return minify(result.toString());
 	});
 };
 
-const processSCSS = function (scss) {
-	return postcss().use(textIndentationPlugin).process(scss, {
+const processSCSS = function (scss, minifier) {
+	return postcss().use(textIndentationPluginSCSS).process(scss, {
 		syntax: postcssScss
 	}).then(result => {
-		const output = nodeSass.renderSync({
-			data: result.content
-		}).css.toString();
+		const output = result.toString();
+		const minifyHandler = minifier || minify;
 
-		return minify(output);
+		return minifyHandler(output);
 	});
 }
 
@@ -252,10 +261,12 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 				`;
 
 				const expected = `
-					.parent-selector .simple-rule {
-						font-size: 14px;
-						line-height: 18px;
-						font-family: Arial;
+					.parent-selector {
+						.simple-rule {
+							font-size: 14px;
+							line-height: 18px;
+							font-family: Arial;
+						}
 					}
 				`;
 
@@ -304,10 +315,12 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 				`;
 
 				const expected = `
-					html[lang="ko"] .rule-with-parent {
-						font-size: 14px;
-						line-height: 18px;
-						font-family: Arial;
+					html[lang="ko"] {
+						.rule-with-parent {
+							font-size: 14px;
+							line-height: 18px;
+							font-family: Arial;
+						}
 					}
 				`;
 
@@ -361,10 +374,16 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 				`;
 
 				const expected = `
-					.description-block > .copy-block .rule-with-complex-parent-selector {
-						font-size: 14px;
-						line-height: 18px;
-						font-family: Arial;
+					.description-block {
+						> {
+							.copy-block {
+								.rule-with-complex-parent-selector {
+									font-size: 14px;
+									line-height: 18px;
+									font-family: Arial;
+								}
+							}
+						}
 					}
 				`;
 
@@ -548,8 +567,8 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 				`;
 
 				const expected = `
-					@media (min-width: 1499px) {
-						.simple-rule-within-media {
+					.simple-rule-within-media {
+						@media (min-width: 1499px) {
 							font-size: 16px;
 							line-height: 22px;
 						}
@@ -624,8 +643,8 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 				`;
 
 				const expected = `
-					@media (min-width: 1499px) {
-						.parent-selector .simple-rule-within-media {
+					.parent-selector .simple-rule-within-media {
+						@media (min-width: 1499px) {
 							font-size: 16px;
 							line-height: 22px;
 						}
@@ -706,9 +725,9 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 				`;
 
 				const expected = `
-					@media (min-width: 1499px) {
-						.first-rule-within-media,
-						.second-rule-within-media {
+					.first-rule-within-media,
+					.second-rule-within-media {
+						@media (min-width: 1499px) {
 							font-size: 16px;
 							line-height: 22px;
 						}
@@ -791,10 +810,10 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 					}
 				`;
 				const expected = `
-					@media (min-width: 1499px) {
-						.first-parent-selector .first-rule-within-media,
-						.second-rule-within-media,
-						.third-parent-selector .third-rule-within-media {
+					.first-parent-selector .first-rule-within-media,
+					.second-rule-within-media,
+					.third-parent-selector .third-rule-within-media {
+						@media (min-width: 1499px) {
 							font-size: 16px;
 							line-height: 22px;
 						}
@@ -859,11 +878,13 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 				`;
 				const expected = `
 					.simple-rule {
-						padding-bottom: 20px;
-						transform: translate(20px);
+						padding-bottom: 24px - 4 - 0;
+						transform: translate(24px - 4 - 0);
 					}
-					.initial-parent-selector .simple-rule {
-						margin-top: 20px;
+					.initial-parent-selector {
+						.simple-rule {
+							margin-top: 24px - 4 - 0;
+						}
 					}
 				`;
 
@@ -906,10 +927,11 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 			`;
 				const expected = `
 				.simple-rule {
-					padding-bottom: 24px;
-				}
-				.only-parent-selector .simple-rule {
-					padding-bottom: 20px;
+					padding-bottom: 24px - 0 - 0;
+					
+					.only-parent-selector & {
+						padding-bottom: 24px - 4 - 0;
+					}
 				}
 			`;
 
@@ -951,10 +973,11 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 				`;
 				const expected = `
 					.simple-rule {
-						padding-bottom: 24px;
-					}
-					html[lang=en] .simple-rule {
-						padding-bottom: 20px;
+						padding-bottom: 24px - 0 - 0;
+						
+						html[lang=en] & {
+							padding-bottom: 24px - 4 - 0;
+						}
 					}
 				`;
 
@@ -996,10 +1019,11 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 				`;
 				const expected = `
 					.rule {
-						padding-bottom: 24px;
-					}
-					.complex:first-child > .parent + selector .rule {
-						padding-bottom: 20px;
+						padding-bottom: 24px - 0 - 0;
+						
+						.complex:first-child > .parent + selector & {
+							padding-bottom: 24px - 4 - 0;
+						}
 					}
 				`;
 
@@ -1042,7 +1066,7 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 				const expected = `
 					.first-selector-in-multiple-selectors, 
 					.second-selector-in-multiple-selectors {
-							margin-top: 20px;
+							margin-top: 24px - 4 - 0;
 					}
 				`;
 
@@ -1089,7 +1113,7 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 					.first-parent-selector .first-selector-in-multiple-selectors, 
 					.second-selector-in-multiple-selectors,
 					.third-parent > div .third-selector-in-multiple-selectors {
-						padding-bottom: 20px;
+						padding-bottom: 24px - 4 - 0;
 					}
 				`;
 
@@ -1135,7 +1159,7 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 				const expected = `
 					@media (min-width: 1499px) {
 						.simple-rule-within-media {
-							margin-top: 20px;
+							margin-top: 24px - 4 - 0;
 						}
 					}
 				`;
@@ -1155,9 +1179,11 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 					}
 				`;
 				const expected = `
-					@media (min-width: 1499px) {
-						.simple-rule-within-media {
-							margin-top: 20px;
+					.simple-rule-within-media {
+						@media (min-width: 1499px) {
+							& {
+								margin-top: 24px - 4 - 0;
+							}
 						}
 					}
 				`;
@@ -1175,9 +1201,9 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 					}
 				`;
 				const expected = `
-					@media (min-width: 1499px) {
-						.simple-rule-within-media {
-							margin-top: 20px;
+					.simple-rule-within-media {
+						@media (min-width: 1499px) {
+							margin-top: 24px - 4 - 0;
 						}
 					}
 				`;
@@ -1225,8 +1251,10 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 				`;
 				const expected = `
 					@media (min-width: 1499px) {
-						.parent-selector .simple-rule-within-media {
-							margin-top: 20px;
+						.parent-selector {
+							.simple-rule-within-media {
+								margin-top: 24px - 4 - 0;
+							}
 						}
 					}
 				`;
@@ -1248,9 +1276,13 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 					}
 				`;
 				const expected = `
-					@media (min-width: 1499px) {
-						.parent-selector .simple-rule-within-media {
-							margin-top: 20px;
+					.parent-selector {
+						.simple-rule-within-media {
+							@media (min-width: 1499px) {
+								& {
+									margin-top: 24px - 4 - 0;
+								}
+							}
 						}
 					}
 				`;
@@ -1270,9 +1302,11 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 					}
 				`;
 				const expected = `
-					@media (min-width: 1499px) {
-						.parent-selector .simple-rule-within-media {
-							margin-top: 20px;
+					.parent-selector {
+						.simple-rule-within-media {
+							@media (min-width: 1499px) {
+								margin-top: 24px - 4 - 0;
+							}
 						}
 					}
 				`;
@@ -1323,7 +1357,7 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 					@media (min-width: 1499px) {
 						.first-rule-within-media,
 						.second-rule-within-media {
-							margin-top: 20px;
+							margin-top: 24px - 4 - 0;
 						}
 					}
 				`;
@@ -1344,10 +1378,12 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 					}
 				`;
 				const expected = `
-					@media (min-width: 1499px) {
-						.first-rule-within-media,
-						.second-rule-within-media {
-							margin-top: 20px;
+					.first-rule-within-media,
+					.second-rule-within-media {
+						@media (min-width: 1499px) {
+							& {
+								margin-top: 24px - 4 - 0;
+							}
 						}
 					}
 				`;
@@ -1366,10 +1402,10 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 					}
 				`;
 				const expected = `
-					@media (min-width: 1499px) {
-						.first-rule-within-media,
-						.second-rule-within-media {
-							margin-top: 20px;
+					.first-rule-within-media,
+					.second-rule-within-media {
+						@media (min-width: 1499px) {
+							margin-top: 24px - 4 - 0;
 						}
 					}
 				`;
@@ -1424,7 +1460,7 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 						.first-parent-selector .first-rule-within-media,
 						.second-rule-within-media,
 						.third-parent-selector .third-rule-within-media {
-							margin-top: 20px;
+							margin-top: 24px - 4 - 0;
 						}
 					}
 				`;
@@ -1446,11 +1482,13 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 					}
 				`;
 				const expected = `
-					@media (min-width: 1499px) {
-						.first-parent-selector .first-rule-within-media,
-						.second-rule-within-media,
-						.third-parent-selector .third-rule-within-media {
-							margin-top: 20px;
+					.first-parent-selector .first-rule-within-media,
+					.second-rule-within-media,
+					.third-parent-selector .third-rule-within-media {
+						@media (min-width: 1499px) {
+							& {
+								margin-top: 24px - 4 - 0;
+							}
 						}
 					}
 				`;
@@ -1470,11 +1508,11 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 					}
 				`;
 				const expected = `
-					@media (min-width: 1499px) {
-						.first-parent-selector .first-rule-within-media,
-						.second-rule-within-media,
-						.third-parent-selector .third-rule-within-media {
-							margin-top: 20px;
+					.first-parent-selector .first-rule-within-media,
+					.second-rule-within-media,
+					.third-parent-selector .third-rule-within-media {
+						@media (min-width: 1499px) {
+							margin-top: 24px - 4 - 0;
 						}
 					}
 				`;
@@ -1521,10 +1559,11 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 				`;
 				const expected = `
 					.simple-rule {
-						padding-bottom: 24px;
-					}
-					.only-parent-selector .simple-rule {
-						padding-bottom: 20px;
+						padding-bottom: 24px - 0 - 0;
+						
+						.only-parent-selector & {
+							padding-bottom: 24px - 4 - 0;
+						}
 					}
 				`;
 
@@ -1566,11 +1605,39 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 				`;
 				const expected = `
 					.simple-rule {
-						padding-bottom: 24px;
+						padding-bottom: 24px - 0 - 0;
+						
+						@media (min-width: 1499px) {
+							& {
+								padding-bottom: 24px - 4 - 0;
+							}
+						}
 					}
+					
+				`;
+
+				expect.assertions(1);
+				return expect(processSCSS(scss)).resolves.toBe(minify(expected));
+			});
+
+			test('with atRule parameter only, inside atRule', () => {
+				const scss = `
 					@media (min-width: 1499px) {
 						.simple-rule {
-							padding-bottom: 20px;
+							padding-bottom: 24px /*{24px, simple-rule-with-atrule-correction}*/;
+						}
+					}
+				`;
+				const expected = `
+					@media (min-width: 1499px) {
+						.simple-rule {
+							padding-bottom: 24px - 0 - 0;
+							
+							@media (min-width: 1499px) {
+								& {
+									padding-bottom: 24px - 4 - 0;
+								}
+							}
 						}
 					}
 				`;
@@ -1614,11 +1681,12 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 				`;
 				const expected = `
 					.simple-rule {
-						padding-bottom: 24px;
-					}
-					@media (min-width: 1499px) {
-						.parent-selector .simple-rule {
-							padding-bottom: 20px;
+						padding-bottom: 24px - 0 - 0;
+						
+						@media (min-width: 1499px) {
+							.parent-selector & {
+								padding-bottom: 24px - 4 - 0;
+							}
 						}
 					}
 				`;
@@ -1631,7 +1699,7 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 
 
 		describe('css', () => {
-			test('with combination of correction rules: simple, atrule, selector, atrule + selector', () => {
+			test('with combination of correction rules (simple, atrule, selector, atrule + selector)', () => {
 				const css = `
 					.simple-rule {
 						background: red;
@@ -1656,10 +1724,42 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 				expect.assertions(1);
 				return expect(processCSS(css)).resolves.toBe(minify(expected));
 			});
+
+			test('with combination of correction rules (simple, atrule, selector, atrule + selector) inside atRule', () => {
+				const css = `
+					@media (min-width: 1499px) {
+						.simple-rule {
+							background: red;
+							padding-bottom: 24px /*{24px, combination}*/;
+						}
+					}
+				`;
+				const expected = `
+					@media (min-width: 1499px) {
+						.simple-rule {
+							background: red;
+							padding-bottom: 20px;
+						}
+						
+						.parent-selector .simple-rule {
+							padding-bottom: 20px;
+						}
+						
+						@media (min-width: 1499px) {
+							.parent-selector .simple-rule {
+								padding-bottom: 20px;
+							}
+						}
+					}
+				`;
+
+				expect.assertions(1);
+				return expect(processCSS(css)).resolves.toBe(minify(expected));
+			});
 		});
 
 		describe('scss', () => {
-			test('with combination of correction rules: simple, atrule, selector, atrule + selector', () => {
+			test('with combination of correction rules (simple, atrule, selector, atrule + selector)', () => {
 				const scss = `
 					.simple-rule {
 						background: red;
@@ -1669,14 +1769,108 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 				const expected = `
 					.simple-rule {
 						background: red;
-						padding-bottom: 20px;
+						padding-bottom: 24px - 4 - 0;
+						
+						.parent-selector & {
+							padding-bottom: 24px - 4 - 0;
+						}
+						
+						@media (min-width: 1499px) {
+							.parent-selector & {
+								padding-bottom: 24px - 4 - 0;
+							}
+						}
 					}
-					.parent-selector .simple-rule {
-						padding-bottom: 20px;
+				`;
+
+				expect.assertions(1);
+				return expect(processSCSS(scss)).resolves.toBe(minify(expected));
+			});
+
+			test('with combination of correction rules (simple, atrule, selector, atrule + selector) inside atRule with &, located in selector', () => {
+				const scss = `
+					.simple-rule {
+						@media (min-width: 1499px) {
+							& {
+								padding-bottom: 24px /*{24px, combination}*/;
+							}
+						}
 					}
-					@media (min-width: 1499px) {
-						.parent-selector .simple-rule {
-							padding-bottom: 20px;
+				`;
+				const expected = `
+					.simple-rule {
+						@media (min-width: 1499px) {
+							& {
+								padding-bottom: 24px - 4 - 0;
+								
+								.parent-selector & {
+									padding-bottom: 24px - 4 - 0;
+								}
+								
+								@media (min-width: 1499px) {
+									.parent-selector & {
+										padding-bottom: 24px - 4 - 0;
+									}
+								}
+							}
+						}
+					}
+				`;
+
+				expect.assertions(1);
+				return expect(processSCSS(scss)).resolves.toBe(minify(expected));
+			});
+
+			test('with combination of correction rules (simple, atrule, selector, atrule + selector) inside atRule without &, located in selector', () => {
+				const scss = `
+					.simple-rule {
+						@media (min-width: 1499px) {
+							padding-bottom: 24px /*{24px, combination}*/;
+						}
+					}
+				`;
+				const expected = `
+					.simple-rule {
+						@media (min-width: 1499px) {
+							padding-bottom: 24px - 4 - 0;
+							
+							.parent-selector & {
+								padding-bottom: 24px - 4 - 0;
+							}
+							
+							@media (min-width: 1499px) {
+								.parent-selector & {
+									padding-bottom: 24px - 4 - 0;
+								}
+							}
+						}
+					}
+				`;
+
+				expect.assertions(1);
+				return expect(processSCSS(scss)).resolves.toBe(minify(expected));
+			});
+
+			test('with combination of correction rules: simple, atrule, selector, atrule + selector, inside atRule without &, located in selector', () => {
+				const scss = `
+					.simple-rule {
+						background: red;
+						padding-bottom: 24px /*{24px, combination}*/;
+					}
+				`;
+				const expected = `
+					.simple-rule {
+						background: red;
+						padding-bottom: 24px - 4 - 0;
+						
+						.parent-selector & {
+							padding-bottom: 24px - 4 - 0;
+						}
+						
+						@media (min-width: 1499px) {
+							.parent-selector & {
+								padding-bottom: 24px - 4 - 0;
+							}
 						}
 					}
 				`;
