@@ -104,12 +104,12 @@ const corrections = {
 	'combination': [{
 		atRule: null,
 		selector: '',
-		baseDelta: 4,
+		baseDelta: 1,
 		decreaseBy: 0
 	}, {
 		atRule: null,
 		selector: '.parent-selector',
-		baseDelta: 4,
+		baseDelta: 3,
 		decreaseBy: 0
 	}, {
 		atRule: {
@@ -117,7 +117,26 @@ const corrections = {
 			params: '(min-width: 1499px)'
 		},
 		selector: '.parent-selector',
+		baseDelta: 5,
+		decreaseBy: 0
+	}],
+	'combination-2': [{
+		atRule: null,
+		selector: '',
+		baseDelta: 2,
+		decreaseBy: 0
+	}, {
+		atRule: null,
+		selector: '.parent-selector-2',
 		baseDelta: 4,
+		decreaseBy: 0
+	}, {
+		atRule: {
+			name: 'media',
+			params: '(max-width: 768px)'
+		},
+		selector: '.parent-selector-2',
+		baseDelta: 6,
 		decreaseBy: 0
 	}]
 };
@@ -1709,14 +1728,14 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 				const expected = `
 					.simple-rule {
 						background: red;
-						padding-bottom: 20px;
+						padding-bottom: 23px;
 					}
 					.parent-selector .simple-rule {
-						padding-bottom: 20px;
+						padding-bottom: 21px;
 					}
 					@media (min-width: 1499px) {
 						.parent-selector .simple-rule {
-							padding-bottom: 20px;
+							padding-bottom: 19px;
 						}
 					}
 				`;
@@ -1738,16 +1757,16 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 					@media (min-width: 1499px) {
 						.simple-rule {
 							background: red;
-							padding-bottom: 20px;
+							padding-bottom: 23px;
 						}
 						
 						.parent-selector .simple-rule {
-							padding-bottom: 20px;
+							padding-bottom: 21px;
 						}
 						
 						@media (min-width: 1499px) {
 							.parent-selector .simple-rule {
-								padding-bottom: 20px;
+								padding-bottom: 19px;
 							}
 						}
 					}
@@ -1769,15 +1788,15 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 				const expected = `
 					.simple-rule {
 						background: red;
-						padding-bottom: 24px - 4 - 0;
+						padding-bottom: 24px - 1 - 0;
 						
 						.parent-selector & {
-							padding-bottom: 24px - 4 - 0;
+							padding-bottom: 24px - 3 - 0;
 						}
 						
 						@media (min-width: 1499px) {
 							.parent-selector & {
-								padding-bottom: 24px - 4 - 0;
+								padding-bottom: 24px - 5 - 0;
 							}
 						}
 					}
@@ -1801,15 +1820,15 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 					.simple-rule {
 						@media (min-width: 1499px) {
 							& {
-								padding-bottom: 24px - 4 - 0;
+								padding-bottom: 24px - 1 - 0;
 								
 								.parent-selector & {
-									padding-bottom: 24px - 4 - 0;
+									padding-bottom: 24px - 3 - 0;
 								}
 								
 								@media (min-width: 1499px) {
 									.parent-selector & {
-										padding-bottom: 24px - 4 - 0;
+										padding-bottom: 24px - 5 - 0;
 									}
 								}
 							}
@@ -1832,15 +1851,15 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 				const expected = `
 					.simple-rule {
 						@media (min-width: 1499px) {
-							padding-bottom: 24px - 4 - 0;
+							padding-bottom: 24px - 1 - 0;
 							
 							.parent-selector & {
-								padding-bottom: 24px - 4 - 0;
+								padding-bottom: 24px - 3 - 0;
 							}
 							
 							@media (min-width: 1499px) {
 								.parent-selector & {
-									padding-bottom: 24px - 4 - 0;
+									padding-bottom: 24px - 5 - 0;
 								}
 							}
 						}
@@ -1854,22 +1873,20 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 			test('with combination of correction rules: simple, atrule, selector, atrule + selector, inside atRule without &, located in selector', () => {
 				const scss = `
 					.simple-rule {
-						background: red;
 						padding-bottom: 24px /*{24px, combination}*/;
 					}
 				`;
 				const expected = `
 					.simple-rule {
-						background: red;
-						padding-bottom: 24px - 4 - 0;
+						padding-bottom: 24px - 1 - 0;
 						
 						.parent-selector & {
-							padding-bottom: 24px - 4 - 0;
+							padding-bottom: 24px - 3 - 0;
 						}
 						
 						@media (min-width: 1499px) {
 							.parent-selector & {
-								padding-bottom: 24px - 4 - 0;
+								padding-bottom: 24px - 5 - 0;
 							}
 						}
 					}
@@ -1880,7 +1897,69 @@ describe('postcss-text-indentation-adjustment plugin', () => {
 			});
 		});
 
-		
+		describe('should modify css with several combination corrections', () => {
+			test('with several combinations of correction rules, each one with unique parent selectors and unique atrules', () => {
+				const scss = `
+					.simple-rule {
+						padding-bottom: 24px /*{24px, combination, combination-2}*/;
+					}
+				`;
+				const expected = `
+					.simple-rule {
+						padding-bottom: 24px - 1 - 0 - 2 - 0;
+						
+						.parent-selector & {
+							padding-bottom: 24px - 3 - 0 - 2 - 0;
+						}
+						
+						.parent-selector-2 & {
+							padding-bottom: 24px - 1 - 0 - 4 - 0;
+						}
+						
+						@media (min-width: 1499px) {
+							.parent-selector & {
+								padding-bottom: 24px - 5 - 0 - 0 - 0;
+							}
+						}
+						
+						@media (max-width: 768px) {
+							.parent-selector-2 & {
+								padding-bottom: 24px - 0 - 0 - 6 - 0;
+							}
+						}
+					}
+				`;
+
+				expect.assertions(1);
+				return expect(processSCSS(scss)).resolves.toBe(minify(expected));
+			});
+
+			test('with several combinations of correction rules, each one with the same parent selectors and atrules', () => {
+				const scss = `
+					.simple-rule {
+						padding-bottom: 24px /*{24px, combination, combination}*/;
+					}
+				`;
+				const expected = `
+					.simple-rule {
+						padding-bottom: 24px - 1 - 0 - 1 - 0;
+						
+						.parent-selector & {
+							padding-bottom: 24px - 3 - 0 - 3 - 0;
+						}
+						
+						@media (min-width: 1499px) {
+							.parent-selector & {
+								padding-bottom: 24px - 5 - 0 - 5 - 0;
+							}
+						}
+					}
+				`;
+
+				expect.assertions(1);
+				return expect(processSCSS(scss)).resolves.toBe(minify(expected));
+			});
+		});
 	});
 	
 });
