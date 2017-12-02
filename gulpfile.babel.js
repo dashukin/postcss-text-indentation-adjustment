@@ -19,7 +19,8 @@ import webpack from 'webpack';
 import gulpWebpack from 'gulp-webpack';
 import del from 'del';
 import gulpPostcss from 'gulp-postcss';
-import postcssScss from 'postcss-scss';
+import postcss from 'postcss';
+import postcssSCSS from 'postcss-scss';
 import sass from 'gulp-sass';
 import nodeSass from 'node-sass';
 import fse from 'fs-extra';
@@ -34,12 +35,16 @@ import mergeRules from 'postcss-merge-rules';
 const source = {
 	css: './example/src/css/**/*.css',
 	cssTypography: './example/src/css-typography/css-typography.css',
-	scss: './example/src/scss/**/*.scss',
+	scss: './example/src/scss/example-scss.scss',
 	scssTypography: './example/src/scss-typography/scss-typography.scss',
 	fontMetricsSrc: './example/font-metrics/font-metrics.json'
 };
 
 const output = {
+	postcss: {
+		css: './example/dist/postcss/css',
+		scss: './example/dist/postcss/scss/result.css'
+	},
 	gulp: {
 		css: './example/dist/gulp/css',
 		scss: './example/dist/gulp/scss'
@@ -93,7 +98,7 @@ const webpackExampleConfig = {
 					options: {
 						ident: 'postcss',
 						plugins: [postcssPartialImport(), scssTextMetricsPlugin],
-						parser: postcssScss
+						parser: postcssSCSS
 					}
 				}]
 			})
@@ -155,6 +160,40 @@ gulp.task('compile:css-gulp', () => {
 		.pipe(gulp.dest(output.gulp.css));
 });
 
+gulp.task('compile:scss-postcss', () => {
+	const scssData = nodeSass.renderSync({
+		file: source.scssTypography
+	}).css.toString();
+	const parsedScssData = parseTypography(scssData);
+	const postcssTypographyAdjustmentPlugin = textIndentationAdjustment({
+		corrections: parsedScssData,
+		plainCSS: false
+	});
+
+	del(`${output.postcss.scss}/*`);
+
+	fse.readFile(source.scss, (err, scss) => {
+		postcss([postcssPartialImport(), postcssTypographyAdjustmentPlugin])
+			.process(scss, {
+				syntax: postcssSCSS,
+				from: source.scss,
+				to: output.postcss.scss
+			})
+			.then(postcssResult => {
+				return nodeSass.render({
+					data: postcssResult.css,
+					outputStyle: 'expanded'
+				}, (err, result) => {
+					fse.outputFile(output.postcss.scss, result.css);
+				});
+				fse.outputFile(output.postcss.scss, postcssResult.css);
+			})
+			.catch(e => {
+				console.log(e);
+			});
+	});
+});
+
 gulp.task('compile:scss-gulp', () => {
 	const scssData = nodeSass.renderSync({
 		file: source.scssTypography
@@ -167,9 +206,9 @@ gulp.task('compile:scss-gulp', () => {
 
 	del(`${output.gulp.scss}/*`);
 	gulp.src(source.scss)
-		.pipe(gulpPostcss([postcssPartialImport(), scssTextMetricsPlugin]), {
-			parser: postcssScss
-		})
+		.pipe(gulpPostcss([postcssPartialImport(), scssTextMetricsPlugin], {
+			parser: postcssSCSS
+		}))
 		.pipe(sass({
 			outputStyle: 'expanded'
 		})).on('error', function (err) {
@@ -206,7 +245,7 @@ gulp.task('compile:scss-webpack', () => {
 });
 
 gulp.task('compile:scss', () => {
-	runSequence(['compile:scss-gulp', 'compile:scss-webpack']);
+	runSequence(['compile:scss-postcss', 'compile:scss-gulp', 'compile:scss-webpack']);
 });
 
 gulp.task('compile:css', () => {
