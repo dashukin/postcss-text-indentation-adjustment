@@ -11,7 +11,7 @@
  * @property toEqual
  */
 
-import parser from './parser';
+import parser from '../src/lib/parser';
 
 const dotReplacement = '%dot%';
 
