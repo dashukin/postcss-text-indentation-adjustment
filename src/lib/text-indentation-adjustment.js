@@ -350,7 +350,7 @@ export default postCSS.plugin('postcss-text-indentation-adjustment', (options = 
 				return outputData;
 			}, {});
 
-			// find all possible selector used for exctracted classNames
+			// find all possible selectors used for exctracted classNames
 			const uniqueSelectors = _.uniq(_.reduce(classNamesData, (selectorsOutput, classNameData) => {
 				const classNameDataSelectors = classNameData.reduce((classNameSelectorsOutput, correctionData) => {
 					return classNameSelectorsOutput.push(correctionData.selector), classNameSelectorsOutput;
@@ -425,15 +425,17 @@ export default postCSS.plugin('postcss-text-indentation-adjustment', (options = 
 			}, {});
 
 			// find all possible selector used for exctracted classNames
-			const uniqueAtRules = _.uniq(_.reduce(classNamesData, (selectorsOutput, classNameData) => {
+			const atRules = _.reduce(classNamesData, (selectorsOutput, classNameData) => {
 				const classNameDataSelectors = classNameData.reduce((classNameSelectorsOutput, correctionData) => {
 					return classNameSelectorsOutput.push(correctionData.atRule), classNameSelectorsOutput;
 				}, []);
 
 				return selectorsOutput.concat(classNameDataSelectors);
-			}, [])).filter(atRule => {
+			}, []).filter(atRule => {
 				return !!atRule;
 			});
+
+			const uniqueAtRules = _.uniqWith(atRules, _.isEqual);
 
 			// iterate over unique selectors and create additional declarations based on selectors and classNamesData
 			const atRuleBasedDeclarations = uniqueAtRules.reduce((declarationsOutput, atRule) => {
@@ -443,9 +445,9 @@ export default postCSS.plugin('postcss-text-indentation-adjustment', (options = 
 					const [firstArgument, ...correctionGroupClassNames] = getCorrectionGroupArguments(correctionGroup);
 					const correctionValues = correctionGroupClassNames.reduce((calculatedOutput, correctionClassName) => {
 						const correctedClassNameValues = _.get(classNamesData, correctionClassName, []).filter(data => {
-							return (data.atRule === atRule) || !data.atRule;
+							return (_.isEqual(data.atRule, atRule)) || !data.atRule;
 						});
-						const correctedClassNameValueData = _.find(correctedClassNameValues, {atRule}) || _.find(correctedClassNameValues, {atRule: null}) || null;
+						const correctedClassNameValueData = _.find(correctedClassNameValues, {atRule}) || _.find(correctedClassNameValues, {atRule: null, selector: ''}) || null;
 						const baseDelta		= _.get(correctedClassNameValueData, 'baseDelta', 0);
 						const decreaseBy	= _.get(correctedClassNameValueData, 'decreaseBy', 0);
 
@@ -496,16 +498,18 @@ export default postCSS.plugin('postcss-text-indentation-adjustment', (options = 
 				return outputData;
 			}, {});
 
-			// find all possible selector used for exctracted classNames
-			const uniqueAtRulesSelectors = _.uniq(_.reduce(classNamesData, (selectorsOutput, classNameData) => {
+			const atRulesSelectors = _.reduce(classNamesData, (selectorsOutput, classNameData) => {
 				const classNameDataSelectors = classNameData.reduce((classNameSelectorsOutput, correctionData) => {
 					return classNameSelectorsOutput.push({atRule: correctionData.atRule, selector: correctionData.selector}), classNameSelectorsOutput;
 				}, []);
 
 				return selectorsOutput.concat(classNameDataSelectors);
-			}, [])).filter(atRule => {
+			}, []).filter(atRule => {
 				return !!atRule;
 			});
+
+			// find all possible selector used for exctracted classNames
+			const uniqueAtRulesSelectors = _.uniqWith(atRulesSelectors, _.isEqual);
 
 			// iterate over unique selectors and create additional declarations based on selectors and classNamesData
 			const atRuleBasedDeclarations = uniqueAtRulesSelectors.reduce((declarationsOutput, uniqueData) => {
@@ -515,7 +519,7 @@ export default postCSS.plugin('postcss-text-indentation-adjustment', (options = 
 					const [firstArgument, ...correctionGroupClassNames] = getCorrectionGroupArguments(correctionGroup);
 					const correctionValues = correctionGroupClassNames.reduce((calculatedOutput, correctionClassName) => {
 						const correctedClassNameValues = _.get(classNamesData, correctionClassName, []).filter(data => {
-							return (data.atRule === uniqueData.atRule) && (data.selector === uniqueData.selector) || (!data.atRule && !data.selector);
+							return (_.isEqual(data.atRule, uniqueData.atRule)) && (data.selector === uniqueData.selector) || (!data.atRule && !data.selector);
 						});
 
 						const correctedClassNameValueData = _.find(correctedClassNameValues, {atRule: uniqueData.atRule, selector: uniqueData.selector}) || _.find(correctedClassNameValues, {atRule: null, selector: ''}) || null;
@@ -719,7 +723,11 @@ export default postCSS.plugin('postcss-text-indentation-adjustment', (options = 
 					if (!plainCSS) {
 						rule.append(newAtRule);
 					} else {
-						rule.root().append(newAtRule);
+						if (parentIsAtrule) {
+							rule.parent.append(newAtRule);
+						} else {
+							rule.root().append(newAtRule);
+						}
 					}
 
 					newAtRule.append(newRule);
