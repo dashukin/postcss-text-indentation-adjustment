@@ -43,7 +43,7 @@ const source = {
 const output = {
 	postcss: {
 		css: './example/dist/postcss/css',
-		scss: './example/dist/postcss/scss/result.css'
+		scss: './example/dist/postcss/scss'
 	},
 	gulp: {
 		css: './example/dist/gulp/css',
@@ -172,21 +172,31 @@ gulp.task('compile:scss-postcss', () => {
 
 	del(`${output.postcss.scss}/*`);
 
+	const sourceFileName = 'example-scss.scss';
+	const outputFileName = 'example-scss.css';
+
 	fse.readFile(source.scss, (err, scss) => {
 		postcss([postcssPartialImport(), postcssTypographyAdjustmentPlugin])
 			.process(scss, {
 				syntax: postcssSCSS,
-				from: source.scss,
-				to: output.postcss.scss
+				from: `${source.scss}`,
+				to: `${output.postcss.scss}/${sourceFileName}`
 			})
 			.then(postcssResult => {
-				return nodeSass.render({
-					data: postcssResult.css,
-					outputStyle: 'expanded'
-				}, (err, result) => {
-					fse.outputFile(output.postcss.scss, result.css);
+				return new Promise((resolve, reject) => {
+					nodeSass.render({
+						data: postcssResult.css,
+						outputStyle: 'expanded'
+					}, (err, result) => {
+						resolve(result);
+					});
 				});
-				fse.outputFile(output.postcss.scss, postcssResult.css);
+			})
+			.then(result => {
+				return postcss([mergeRules(), cssMqPacker()]).process(result.css);
+			})
+			.then(result => {
+				fse.outputFile(`${output.postcss.scss}/${outputFileName}`, result.css);
 			})
 			.catch(e => {
 				console.log(e);
