@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/dashukin/postcss-text-indentation-adjustment.svg?branch=master)](https://travis-ci.org/dashukin/postcss-text-indentation-adjustment)
+[![Build Status](https://travis-ci.org/dashukin/postcss-text-indentation-adjustment.svg?branch=master)](https://travis-ci.org/dashukin/postcss-text-indentation-adjustment) [![tested with jest](https://img.shields.io/badge/tested_with-jest-99424f.svg)](https://github.com/facebook/jest)
 
 # postcss-text-indentation-adjustment
 PostCSS plugin for adjusting measurements or position values like padding, margin, translateY, top, bottom, etc. based on typography class names and relevant text metrics.
